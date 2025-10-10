@@ -91,4 +91,4 @@ Your infra will self-destruct if you:
 * Open a public port to your app.
 * Try to skip Stacks or Actions.
 
-This tape will not self-destruct, but your grade might.
+This document will not self-destruct, but your grade might..
