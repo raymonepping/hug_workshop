@@ -7,6 +7,15 @@ terraform {
   }
 }
 
+variable "TF_VAR_region" {
+  type    = string
+  default = "eu-west-1"
+}
+variable "TF_VAR_environment" {
+  type    = string
+  default = "dev"
+}
+
 provider "docker" {}
 
 resource "docker_image" "nginx" {
