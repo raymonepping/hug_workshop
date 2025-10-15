@@ -123,3 +123,5 @@ docker-compose.override.yml
 .terraform/
 *.tfstate
 *.tfstate.backup
+.terraform.lock.hcl
+crash.log
