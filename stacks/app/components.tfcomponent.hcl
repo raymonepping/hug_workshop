@@ -1,7 +1,7 @@
 component "nginx" {
-  source = "../../modules/nginx"
+  source = "./modules/nginx"  
+
   inputs = {
-    # default; overridden per-deployment
-    external_port = 8080
+    external_port = 8080  
   }
 }

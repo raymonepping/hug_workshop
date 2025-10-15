@@ -1,6 +1,6 @@
 
 
-## 📁 Folder Tree - 2025-10-15 16:39:49 ##
+## 📁 Folder Tree - 2025-10-15 16:49:50 ##
 
 ./
 ├── modules/
@@ -12,11 +12,11 @@
 │   └── app/
 │     ├── components.tfcomponent.hcl
 │     └── deployments.tfdeploy.hcl
+├── .terraform-version
 ├── .terraform.lock.hcl
 ├── FOLDER_TREE.md
 ├── LICENSE
-├── main.tf
 ├── README.md
 └── terraform.tfstate
 
-6 directories, 10 files
+6 directories, 11 files
