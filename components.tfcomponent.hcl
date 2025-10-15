@@ -1,7 +1,8 @@
+# components.tfcomponent.hcl (at repo root on stack-app)
 component "nginx" {
-  source = "../../modules/nginx"
+  source = "./modules/nginx"  # <- correct
+
   inputs = {
-    # will be overridden per-deployment
     external_port = 8080
   }
 }
