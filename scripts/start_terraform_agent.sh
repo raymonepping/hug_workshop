@@ -52,20 +52,23 @@ up() {
   if [ "$FG" = true ]; then
     echo "📺 Running in foreground (Ctrl+C to stop)"
     exec docker run --rm \
-      --name "$NAME" \
-      --platform "$PLATFORM" \
-      -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
-      -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
-      "$IMAGE"
+    --name "$NAME" \
+    --platform "$PLATFORM" \
+    -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
+    -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    "$IMAGE"
   else
     docker run -d \
-      --name "$NAME" \
-      --platform "$PLATFORM" \
-      --pull always \
-      --restart unless-stopped \
-      -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
-      -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
-      "$IMAGE" >/dev/null
+    --name "$NAME" \
+    --platform "$PLATFORM" \
+    --pull always \
+    --restart unless-stopped \
+    -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
+    -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    "$IMAGE" >/dev/null
+    sleep 2
     echo "✅ Agent started in background (use 'logs' to view output)."
   fi
 }
