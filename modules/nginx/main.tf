@@ -7,13 +7,9 @@ terraform {
   }
 }
 
-variable "TF_VAR_region" {
-  type    = string
-  default = "eu-west-1"
-}
-variable "TF_VAR_environment" {
-  type    = string
-  default = "development"
+variable "external_port" {
+  type    = number
+  default = 8080
 }
 
 provider "docker" {}
@@ -24,19 +20,19 @@ resource "docker_image" "nginx" {
 }
 
 resource "docker_container" "nginx" {
-  name  = "hug-nginx"
+  name  = "hug-nginx-${var.external_port}"
   image = docker_image.nginx.name
 
   ports {
     internal = 80
-    external = 8080
+    external = var.external_port
   }
 }
 
-output "nginx_container_name" {
+output "container_name" {
   value = docker_container.nginx.name
 }
 
-output "nginx_container_port" {
-  value = docker_container.nginx.ports[0].external
+output "endpoint" {
+  value = "http://localhost:${var.external_port}"
 }
