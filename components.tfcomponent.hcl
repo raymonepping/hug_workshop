@@ -1,7 +1,5 @@
-# components.tfcomponent.hcl (at repo root on stack-app)
 component "nginx" {
-  source = "./modules/nginx"  # <- correct
-
+  source = "git::https://github.com/raymonepping/hug_workshop.git//modules/nginx?ref=main"
   inputs = {
     external_port = 8080
   }
