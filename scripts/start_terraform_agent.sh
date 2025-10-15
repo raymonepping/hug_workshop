@@ -1,30 +1,20 @@
 #!/usr/bin/env bash
 # start_terraform_agent.sh
-#
-# Manage a Terraform Cloud Agent in Docker.
 # Usage:
-#   ./start_terraform_agent.sh up [--fg]   # start agent (default = background)
-#   ./start_terraform_agent.sh down        # stop and remove agent
-#   ./start_terraform_agent.sh restart     # restart agent
-#   ./start_terraform_agent.sh status      # show container status
-#   ./start_terraform_agent.sh logs        # follow agent logs
-#
-# Env file expected at ./scripts/.env with:
-#   TFC_AGENT_NAME=hug-agent-1
-#   TFC_AGENT_TOKEN=atlasv1_xxxxxxxxxxxxxxx
+#   ./start_terraform_agent.sh up [--fg] [--no-root]
+#   ./start_terraform_agent.sh down
+#   ./start_terraform_agent.sh restart [--fg] [--no-root]
+#   ./start_terraform_agent.sh status
+#   ./start_terraform_agent.sh logs
 
 set -euo pipefail
 
-IMAGE="hashicorp/tfc-agent:1.25.1"   # pin to latest stable
+IMAGE="hashicorp/tfc-agent:1.25.1"
 NAME="tfc-agent"
 PLATFORM="linux/amd64"
 
 ENV_FILE="$(dirname "$0")/.env"
-if [ -f "$ENV_FILE" ]; then
-  set -a
-  . "$ENV_FILE"
-  set +a
-fi
+if [ -f "$ENV_FILE" ]; then set -a; . "$ENV_FILE"; set +a; fi
 
 : "${TFC_AGENT_NAME:?TFC_AGENT_NAME must be set in .env}"
 : "${TFC_AGENT_TOKEN:?TFC_AGENT_TOKEN must be set in .env}"
@@ -32,43 +22,85 @@ fi
 container_exists() { docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; }
 container_running() { docker ps --format '{{.Names}}' | grep -qx "$NAME"; }
 
-up() {
-  local FG=false
-  if [[ "${1:-}" == "--fg" ]]; then
-    FG=true
+canon_path() {
+  local p="$1"
+  if command -v readlink >/dev/null 2>&1; then
+    readlink -f "$p" 2>/dev/null || readlink "$p" 2>/dev/null || echo "$p"
+  else
+    echo "$p"
   fi
+}
 
-  if container_running; then
-    echo "✅ $NAME already running."
+file_gid() {
+  local p="$1"
+  if stat -c '%g' "$p" >/dev/null 2>&1; then stat -c '%g' "$p"
+  elif stat -f '%g' "$p" >/dev/null 2>&1; then stat -f '%g' "$p"
+  else echo ""; fi
+}
+
+# Sets global arrays: DOCKER_MOUNT_ARGS, DOCKER_ENV_ARGS
+detect_docker_access() {
+  DOCKER_MOUNT_ARGS=()
+  DOCKER_ENV_ARGS=()
+
+  local host="${DOCKER_HOST:-}"
+  if [[ -n "$host" && "$host" == tcp://* ]]; then
+    DOCKER_ENV_ARGS=( -e "DOCKER_HOST=$host" )
     return
   fi
-  if container_exists; then
-    echo "🧹 Removing stale container…"
-    docker rm -f "$NAME" >/dev/null
+
+  local sock_path="/var/run/docker.sock"
+  if [[ -n "$host" && "$host" == unix://* ]]; then
+    sock_path="${host#unix://}"
   fi
 
-  echo "🚀 Starting Terraform Agent: $TFC_AGENT_NAME"
+  local real_sock; real_sock="$(canon_path "$sock_path")"
+  if [ ! -S "$real_sock" ]; then
+    echo "❌ Docker socket not found: $real_sock"
+    echo "   Start Docker, or export DOCKER_HOST=tcp://host.docker.internal:2375"
+    exit 1
+  fi
 
+  DOCKER_MOUNT_ARGS=( -v "${real_sock}:/var/run/docker.sock" )
+
+  local gid; gid="$(file_gid "$real_sock" || true)"
+  if [[ -n "${gid:-}" && "$gid" =~ ^[0-9]+$ && "$gid" -gt 0 ]]; then
+    DOCKER_MOUNT_ARGS+=( --group-add "$gid" )
+  fi
+}
+
+up() {
+  local FG=false RUN_AS_ROOT=true
+  for arg in "${@:-}"; do
+    case "$arg" in
+      --fg)      FG=true ;;
+      --no-root) RUN_AS_ROOT=false ;;
+    esac
+  done
+
+  if container_running; then echo "✅ $NAME already running."; return; fi
+  if container_exists; then echo "🧹 Removing stale container…"; docker rm -f "$NAME" >/dev/null; fi
+
+  detect_docker_access
+
+  local COMMON_FLAGS=(
+    --name "$NAME"
+    --platform "$PLATFORM"
+    --pull=always
+    -e "TFC_AGENT_TOKEN=$TFC_AGENT_TOKEN"
+    -e "TFC_AGENT_NAME=$TFC_AGENT_NAME"
+    "${DOCKER_MOUNT_ARGS[@]}"
+    "${DOCKER_ENV_ARGS[@]}"
+  )
+  if [ "$RUN_AS_ROOT" = true ]; then COMMON_FLAGS+=( --user 0:0 ); fi
+
+  echo "🚀 Starting Terraform Agent: $TFC_AGENT_NAME"
   if [ "$FG" = true ]; then
-    echo "📺 Running in foreground (Ctrl+C to stop)"
-    exec docker run --rm \
-    --name "$NAME" \
-    --platform "$PLATFORM" \
-    -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
-    -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    "$IMAGE"
+    echo "📺 Foreground mode (Ctrl+C to stop)"
+    exec docker run --rm "${COMMON_FLAGS[@]}" "$IMAGE"
   else
-    docker run -d \
-    --name "$NAME" \
-    --platform "$PLATFORM" \
-    --pull always \
-    --restart unless-stopped \
-    -e TFC_AGENT_TOKEN="$TFC_AGENT_TOKEN" \
-    -e TFC_AGENT_NAME="$TFC_AGENT_NAME" \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    "$IMAGE" >/dev/null
-    sleep 2
+    docker run -d --restart=unless-stopped "${COMMON_FLAGS[@]}" "$IMAGE" >/dev/null
+    sleep 1
     echo "✅ Agent started in background (use 'logs' to view output)."
   fi
 }
@@ -97,13 +129,10 @@ status() {
 logs() { docker logs -f "$NAME"; }
 
 case "${1:-}" in
-  up) up "${2:-}" ;;
+  up) shift; up "$@" ;;
   down) down ;;
-  restart) restart "${2:-}" ;;
+  restart) shift; restart "$@" ;;
   status) status ;;
   logs) logs ;;
-  *)
-    echo "Usage: $0 {up [--fg]|down|restart [--fg]|status|logs}"
-    exit 1
-    ;;
+  *) echo "Usage: $0 {up [--fg] [--no-root]|down|restart [--fg] [--no-root]|status|logs}"; exit 1 ;;
 esac

@@ -13,7 +13,7 @@ variable "TF_VAR_region" {
 }
 variable "TF_VAR_environment" {
   type    = string
-  default = "dev"
+  default = "development"
 }
 
 provider "docker" {}
