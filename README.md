@@ -86,14 +86,14 @@ Submit a **field report** (Markdown, slides, or PDF) with:
 ## 🛠️ Workshop Scripts
 
 To speed up your mission, we’ve prepared a couple of scripts under ./scripts/:
-
+```
 ./
 ├── scripts/
 │   ├── setup_stacks.sh*          # Clones the demo repos, runs fmt/validate/init
 │   └── start_terraform_agent.sh* # Launches a local Terraform Agent
 ├── LICENSE
 └── README.md
-
+```
 ### 🔧 setup_stacks.sh
 
 Clones both repositories into a local working directory, then runs:
