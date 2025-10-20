@@ -1,22 +1,26 @@
 
 
-## 📁 Folder Tree - 2025-10-15 17:11:14 ##
+## 📁 Folder Tree - 2025-10-20 13:36:01 ##
 
 ./
 ├── modules/
 │   └── nginx/
 │     └── main.tf
 ├── scripts/
+│   ├── clean_tf_artifacts.sh*
 │   └── start_terraform_agent.sh*
 ├── stacks/
-│   └── app/
-│     ├── components.tfcomponent.hcl
-│     └── deployments.tfdeploy.hcl
+│   ├── app/
+│   │   ├── .terraform-version
+│   │   ├── .terraform.lock.hcl*
+│   │   ├── components.tfcomponent.hcl
+│   │   └── deployments.tfdeploy.hcl
+│   └── .terraform.lock.hcl*
 ├── .terraform-version
-├── .terraform.lock.hcl
+├── components.tfcomponent.hcl
+├── deployments.tfdeploy.hcl
 ├── FOLDER_TREE.md
 ├── LICENSE
-├── README.md
-└── terraform.tfstate
+└── README.md
 
-6 directories, 10 files
+6 directories, 14 files
