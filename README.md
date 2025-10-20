@@ -83,6 +83,36 @@ Submit a **field report** (Markdown, slides, or PDF) with:
 
 ---
 
+## 🛠️ Workshop Scripts
+
+To speed up your mission, we’ve prepared a couple of scripts under ./scripts/:
+
+./
+├── scripts/
+│   ├── setup_stacks.sh*          # Clones the demo repos, runs fmt/validate/init
+│   └── start_terraform_agent.sh* # Launches a local Terraform Agent
+├── LICENSE
+└── README.md
+
+### 🔧 setup_stacks.sh
+
+Clones both repositories into a local working directory, then runs:
+
+terraform fmt → formats code
+
+terraform stacks validate → validates configuration
+
+terraform stacks init → initializes providers and dependencies
+
+Result: you start with a clean, ready-to-go setup.
+
+### 🚀 start_terraform_agent.sh
+
+Starts a Terraform Agent connected to your HCP Terraform organization.
+This is required for the workshop since Stacks will run in Agent execution mode.
+
+---
+
 ## ⚠️ Warning
 
 Your infra will self-destruct if you:
