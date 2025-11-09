@@ -1,27 +1,37 @@
 
 
-## 📁 Folder Tree - 2025-10-20 13:45:43 ##
+## 📁 Folder Tree - 2025-11-09 16:02:38 ##
 
 ./
-├── modules/
-│   └── nginx/
-│     └── main.tf
+├── backend/
+│   ├── connectors/
+│   │   ├── couchbase.js
+│   │   ├── mongodb.js
+│   │   ├── mysql.js
+│   │   └── postgres.js
+│   ├── db.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js
+│   └── vault.js
+├── frontend/
+│   ├── frontend.js
+│   ├── index.html
+│   ├── package-lock.json
+│   └── package.json
 ├── scripts/
 │   ├── clean_tf_artifacts.sh*
+│   ├── dataset.jsonl
+│   ├── dataset.jsonl.enc
+│   ├── generate_dataset.sh*
+│   ├── lines.txt
+│   ├── seed_dataset.sh*
 │   ├── setup_stacks.sh*
 │   └── start_terraform_agent.sh*
-├── stacks/
-│   ├── app/
-│   │   ├── .terraform-version
-│   │   ├── .terraform.lock.hcl*
-│   │   ├── components.tfcomponent.hcl
-│   │   └── deployments.tfdeploy.hcl
-│   └── .terraform.lock.hcl*
 ├── .terraform-version
-├── components.tfcomponent.hcl
-├── deployments.tfdeploy.hcl
 ├── FOLDER_TREE.md
 ├── LICENSE
+├── main.tf
 └── README.md
 
-6 directories, 15 files
+5 directories, 26 files
