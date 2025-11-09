@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Workshop Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#07090d; --bg2:#0b1220; --card:#0f172a; --card2:#111827;
+      --text:#e6eaf2; --muted:#9aa3b2; --ok:#10b981; --warn:#f59e0b;
+      --bad:#ef4444; --accent:#f59e0b; --hug1:#bd34fe; --hug2:#41d1ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% -10%, rgba(189,52,254,.15), transparent 60%),
+        radial-gradient(1000px 700px at 85% -5%,  rgba(65,209,255,.10), transparent 60%),
+        radial-gradient(800px 600px at 50% 120%, rgba(189,52,254,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+
+    .wrap{max-width:980px; margin:64px auto; padding:0 20px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)) , var(--card);
+      border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 22px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35); backdrop-filter: blur(4px);
+    }
+
+    .title{
+      margin:0 0 6px; font-size:32px; font-weight:800; line-height:1.1;
+      background: linear-gradient(90deg, var(--hug1), var(--hug2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .sub{color:var(--muted); margin:0 0 18px; font-size:14px}
+
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px}
+    .pill{
+      padding:6px 10px; border-radius:999px; font-size:12px;
+      background:#0b1220; color:var(--muted); border:1px solid rgba(255,255,255,.06)
+    }
+    .pill.ok{background: rgba(16,185,129,.15); color:var(--ok); border-color:rgba(16,185,129,.25)}
+    .pill.bad{background: rgba(239,68,68,.15); color:var(--bad); border-color:rgba(239,68,68,.25)}
+    .pill.note{background: rgba(245,158,11,.12); color:#f8d28a; border-color:rgba(245,158,11,.25)}
+    .pill.auth.vault { background: rgba(16,185,129,.14); color: var(--ok); border-color: rgba(16,185,129,.28) }
+    .pill.auth.env   { background: rgba(245,158,11,.12); color: #f8d28a;   border-color: rgba(245,158,11,.25) }
+    .pill.auth.lock  { background: rgba(239,68,68,.14);  color: var(--bad); border-color: rgba(239,68,68,.25) }
+
+    input[type="text"]{ background:#0b1220; border:1px solid #1f2937; color:var(--text); padding:8px 10px; border-radius:10px; width:360px }
+    button{ background: linear-gradient(180deg,#ffd27a,#f59e0b); color:#111; border:none; padding:9px 14px; border-radius:10px; font-weight:700; cursor:pointer }
+    button:disabled{opacity:.6; cursor:not-allowed}
+
+    .tableWrap{overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,.06)}
+    table{width:100%; border-collapse:collapse; background:linear-gradient(180deg,rgba(255,255,255,.01),rgba(255,255,255,.00)), var(--card2)}
+    th,td{padding:10px 10px; border-bottom:1px solid #1f2937; text-align:left}
+    th{color:#cbd5e1; font-weight:700; font-size:13px; background:rgba(255,255,255,.01); position:sticky; top:0}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .muted{color:var(--muted)}
+    .right{margin-left:auto}
+
+    .locked { padding:12px 14px; border-radius:12px; margin-top:8px;
+      background: rgba(239,68,68,.10); border:1px solid rgba(239,68,68,.25); color: var(--bad);
+    }
+
+    /* Footer polish */
+    .footerWrap{
+      margin-top:16px; padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+    .footerLine{ display:flex; align-items:center; gap:10px; line-height:1.4; margin-bottom:8px; }
+    .quote{
+      padding:8px 12px; border-left:3px solid rgba(189,52,254,.6);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border-radius:10px; font-weight:500; letter-spacing:.1px;
+    }
+    .badge{
+      font-size:12px; padding:4px 8px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.08); background:#0b1220; color:var(--muted); white-space:nowrap;
+    }
+    .badge.vault{ background: rgba(16,185,129,.14); color: var(--ok); border-color: rgba(16,185,129,.28) }
+    .badge.env  { background: rgba(245,158,11,.12); color: #f8d28a;   border-color: rgba(245,158,11,.25) }
+    .badge.lock { background: rgba(239,68,68,.14);  color: var(--bad); border-color: rgba(239,68,68,.25) }
+
+    .tipLine{ color:var(--muted); font-size:12px; opacity:.9; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1 class="title">Workshop Data Viewer</h1>
+      <p class="sub">Fetches items from your backend and shows health status.</p>
+
+      <div class="row">
+        <span id="healthPill" class="pill">Health: checking…</span>
+        <span id="dbPill" class="pill">DB: unknown</span>
+        <span id="authPill" class="pill auth">Auth: …</span>
+        <span id="limitPill" class="pill note">Limit: …</span>
+        <span class="pill right">Backend: <code id="baseUrl"></code></span>
+      </div>
+
+      <div class="row">
+        <input id="apiInput" type="text" placeholder="http://localhost:3004" />
+        <button id="saveApi">Use this API</button>
+        <button id="refreshBtn">Refresh</button>
+        <span id="count" class="pill" style="opacity:.9"></span>
+      </div>
+
+      <div id="lockedMsg" class="locked" style="display:none;">
+        🔒 Access denied. Align your keys with the guardian:
+        enable Vault credentials in the backend to unlock the path.
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr><th style="width:100px;">ID</th><th style="width:100px;">Idx</th><th>Title</th></tr>
+          </thead>
+          <tbody id="itemsTbody">
+            <tr><td colspan="3" class="muted">No data yet…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footerWrap">
+        <div id="footerLine" class="footerLine">
+          <span class="quote">“The data remains silent until the keeper is acknowledged.”</span>
+          <span id="unlockBadge" class="badge lock">locked</span>
+        </div>
+        <div class="tipLine">
+          Tip: set <code>VAULT_ADDR</code>/<code>VAULT_TOKEN</code>/<code>VAULT_DB_KV_PATH</code> in your backend <code>.env</code> to flip DB auth from env creds to Vault.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------- Runtime config -------
+    let CONFIG = { apiBase: 'http://localhost:3004', itemsLimit: 32 };
+    async function loadConfig(){
+      try{
+        const res = await fetch('/config.json', { cache: 'no-store' });
+        if(res.ok){
+          const j = await res.json();
+          if (j && typeof j === 'object'){
+            CONFIG.apiBase    = j.apiBase || CONFIG.apiBase;
+            CONFIG.itemsLimit = Number(j.itemsLimit || CONFIG.itemsLimit) || CONFIG.itemsLimit;
+          }
+        }
+      }catch(_){}
+    }
+
+    // ------- DOM refs -------
+    const apiInput   = document.getElementById('apiInput');
+    const baseUrlEl  = document.getElementById('baseUrl');
+    const saveApiBtn = document.getElementById('saveApi');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const healthPill = document.getElementById('healthPill');
+    const dbPill     = document.getElementById('dbPill');
+    const authPill   = document.getElementById('authPill');
+    const limitPill  = document.getElementById('limitPill');
+    const itemsTbody = document.getElementById('itemsTbody');
+    const countEl    = document.getElementById('count');
+    const lockedMsg  = document.getElementById('lockedMsg');
+    const unlockBadge= document.getElementById('unlockBadge');
+
+    // ------- Helpers -------
+    function getApiBase(){
+      const urlParam = new URLSearchParams(location.search).get('api');
+      const saved = localStorage.getItem('apiBase');
+      return urlParam || saved || CONFIG.apiBase;
+    }
+    function setApiBase(v){ localStorage.setItem('apiBase', v); renderBase(); }
+    function renderBase(){
+      const b = getApiBase();
+      baseUrlEl.textContent = b;
+      apiInput.value = b;
+      limitPill.textContent = `Limit: ${CONFIG.itemsLimit}`;
+    }
+    function setPill(el, ok, label){
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      el.textContent = label;
+    }
+    function classSwap(el, base, variant){
+      el.className = base + (variant ? (' ' + variant) : '');
+    }
+    function applyAuthUI(source, mode){
+      // Update top auth pill
+      classSwap(authPill, 'pill auth',
+        !source ? 'lock' :
+        (String(source).startsWith('vault') ? 'vault' : 'env')
+      );
+      authPill.textContent =
+        !source ? 'Auth: locked' :
+        (String(source).startsWith('vault') ? 'Auth: Vault' :
+          (mode === 'env_only' ? 'Auth: Env (permitted)' : 'Auth: Env'));
+
+      // Update footer badge
+      classSwap(unlockBadge, 'badge',
+        !source ? 'lock' :
+        (String(source).startsWith('vault') ? 'vault' : 'env')
+      );
+      unlockBadge.textContent =
+        !source ? 'locked' :
+        (String(source).startsWith('vault') ? 'unlocked: vault' : 'unlocked: env');
+    }
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    async function fetchJson(path, opts = {}){
+      const base = getApiBase().replace(/\/+$/,'');
+      const res = await fetch(base + path, { headers: { 'Accept': 'application/json' } });
+      if (opts.allow403 && res.status === 403){ return { __locked: true }; }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }
+
+    // ------- Main flow -------
+    async function refresh(){
+      refreshBtn.disabled = true;
+      setPill(healthPill, false, 'Health: checking…');
+      dbPill.className = 'pill'; dbPill.textContent = 'DB: checking…';
+      countEl.textContent = ''; lockedMsg.style.display = 'none';
+      // default: show locked until we know otherwise
+      applyAuthUI(null, 'preferred');
+
+      try{
+        const health = await fetchJson('/health');
+        const mode    = health.mode || 'preferred';
+        const channel = health.channel || null;
+
+        setPill(healthPill, health.ok === true, health.ok ? 'Health: OK' : 'Health: FAIL');
+        setPill(dbPill, !!health.dbReady, health.dbReady ? 'DB: ready' : 'DB: not ready');
+        applyAuthUI(channel, mode);
+
+        if (!health.dbReady){
+          itemsTbody.innerHTML = `<tr><td colspan="3" class="muted">Database not ready</td></tr>`;
+          return;
+        }
+
+        const limit = Number(CONFIG.itemsLimit || 32);
+        const data = await fetchJson(`/api/items?limit=${encodeURIComponent(limit)}`, { allow403:true });
+
+        if (data && data.__locked){
+          applyAuthUI(null, mode);
+          lockedMsg.style.display = 'block';
+          itemsTbody.innerHTML = `<tr><td colspan="3" class="muted">— locked —</td></tr>`;
+          countEl.textContent = '';
+          return;
+        }
+
+        const items = Array.isArray(data.items) ? data.items : [];
+        countEl.textContent = `${items.length} shown`;
+        itemsTbody.innerHTML = items.length
+          ? items.map(row => `
+              <tr>
+                <td>${row.id ?? ''}</td>
+                <td>${row.idx ?? ''}</td>
+                <td>${row.title ? escapeHtml(row.title) : ''}</td>
+              </tr>
+            `).join('')
+          : `<tr><td colspan="3" class="muted">No items found</td></tr>`;
+
+      }catch(err){
+        setPill(healthPill, false, 'Health: error');
+        dbPill.className = 'pill bad'; dbPill.textContent = 'DB: error';
+        itemsTbody.innerHTML = `<tr><td colspan="3" style="color:var(--bad);">Error: ${escapeHtml(String(err.message || err))}</td></tr>`;
+      }finally{
+        refreshBtn.disabled = false;
+      }
+    }
+
+    (async function boot(){
+      await loadConfig();
+      renderBase();
+      refreshBtn.addEventListener('click', refresh);
+      saveApiBtn.addEventListener('click', () => {
+        const v = apiInput.value.trim(); if (!v) return;
+        setApiBase(v); refresh();
+      });
+      await refresh();
+    })();
+  </script>
+</body>
+</html>

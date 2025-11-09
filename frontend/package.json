@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Workshop frontend viewer",
+  "type": "commonjs",
+  "main": "frontend.js",
+  "scripts": {
+    "start": "node --watch frontend.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}

@@ -103,7 +103,9 @@ ipython_config.py
 # 📦 Node.js
 ########################################
 node_modules/
+node_modules/*
 npm-debug.log*
+package-lock.json
 
 ########################################
 # 🐳 Docker
@@ -115,7 +117,11 @@ docker-compose.override.yml
 # 🌍 Environment and Config Files
 ########################################
 .env
+.database.env
+.*.env
 .env.*
+dataset.jsonl
+lines.txt
 
 ########################################
 # 🛠️ Terraform
