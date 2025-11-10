@@ -146,6 +146,6 @@ Use the provided Terraform agent script and run everything through **HCP Terrafo
 If the data speaks without authorization, the system is lying to you.
 If the data remains silent until properly unlocked, you’re doing it right.
 
-```
-*Welcome to the workshop. We got fun and games.*
-```
+---
+
+# Welcome to the workshop. We got fun and games.
