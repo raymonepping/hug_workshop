@@ -52,11 +52,11 @@ ${BOLD}${YELLOW}Verification Gate:${RESET}
       ${GREEN}export VAULT_TOKEN="<token with verify-policy>"${RESET}
 
 ${BOLD}${CYAN}Examples:${RESET}
-  ./seed_dataset.sh seed   --db-type postgres --user workshop --password workshop
-  ./seed_dataset.sh verify --db-type postgres --limit 32
-  ./seed_dataset.sh verify --db-type mysql     --filter "id <= 32"
-  ./seed_dataset.sh verify --db-type couchbase --limit 32
-  ./seed_dataset.sh verify --db-type mongo     --match '{ "_id": { "\$lte": 32 } }'
+  ./seed_dataset.sh seed   --db-type postgres   --user workshop --password workshop
+  ./seed_dataset.sh verify --db-type postgres   --limit 32
+  ./seed_dataset.sh verify --db-type mysql      --filter "id <= 32"
+  ./seed_dataset.sh verify --db-type couchbase  --limit 32
+  ./seed_dataset.sh verify --db-type mongo      --match '{ "_id": { "\$lte": 32 } }'
   ./seed_dataset.sh clean  --db-type mongo
 EOF
 }
@@ -168,10 +168,10 @@ guard_verify_or_die() {
   fi
   if [[ -n "${VERIFY_POLICY:-}" ]]; then
     echo "🔒 Verification locked: Vault unreachable, token invalid, or missing policy '${VERIFY_POLICY}'." >&2
-    echo "   Set VAULT_ADDR/VAULT_TOKEN (and VAULT_NAMESPACE if used), and ensure the token has that policy to unlock." >&2
+    echo "🪄  Set VAULT_ADDR/VAULT_TOKEN (and VAULT_NAMESPACE if used), and ensure the token has that policy to unlock." >&2
   else
     echo "🔒 Verification locked: Vault unreachable or token invalid." >&2
-    echo "   Set VAULT_ADDR/VAULT_TOKEN (and VAULT_NAMESPACE if used) to unlock." >&2
+    echo "🪄  Set VAULT_ADDR/VAULT_TOKEN (and VAULT_NAMESPACE if used) to unlock." >&2
   fi
   exit 1
 }
