@@ -148,5 +148,4 @@ If the data remains silent until properly unlocked, you’re doing it right.
 
 ---
 
-## 🟣 Welcome to the workshop. 
-## 🟡 We got fun and games.
+## 🟣 Welcome to the workshop. // \\ 🟡 We got fun and games.
