@@ -252,4 +252,6 @@ Vault is the **keeper**.
 Your backend must **acknowledge the keeper**.
 Only then does data speak.
 
+---
+
 Good luck — and may your guardian approve your intent. 🛡️
