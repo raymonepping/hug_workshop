@@ -2,6 +2,8 @@
 
 > Looking for deep-dive references? See **[ARTICLE_INDEX.md](./ARTICLE_INDEX.md)**.
 
+---
+
 Your mission is simple to explain and surprisingly fun to execute:
 
 You will deploy a database using **Terraform**, seed it with data, 

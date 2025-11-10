@@ -2,6 +2,8 @@
 
 > Looking for deep-dive references? See **[ARTICLE_INDEX.md](./ARTICLE_INDEX.md)**.
 
+---
+
 This repository contains the code and scripts for the **HUG Workshop** where you will deploy a database, 
 secure access to it using **Vault**, 
 and reveal a hidden message once your backend is properly **unlocked**.
