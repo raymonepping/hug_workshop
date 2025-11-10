@@ -12,7 +12,7 @@ Thumbs.db
 v*.tar.gz
 readme_*.tpl
 reload_version.sh
-./backend/vault.js
+backend/vault.js
 
 ########################################
 # 💻 IDE & Editor Configs
