@@ -23,7 +23,6 @@ Use them to go deeper, faster, and cleaner.
 | III | Guardrails & Governance | https://medium.com/continuous-insights/part-iii-terraform-chronicles-guardrails-347ac3e59402 |
 | IV | Audit & RBAC | https://medium.com/continuous-insights/part-iv-terraform-chronicles-audit-rbac-73cf5fc73a37 |
 | V | Cost Visibility | https://medium.com/continuous-insights/part-v-terraform-chronicles-cost-visibility-f0a503468a85 |
-| VI | Wrap-Up (Why We Do This) | https://medium.com/continuous-insights/part-vi-terraform-chronicles-the-wrap-up-c46f9726cee0 |
 
 ---
 
