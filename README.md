@@ -1,6 +1,8 @@
 # HUG Workshop — **Unlock the Data**
 
-This repository contains the code and scripts for the **HUG Workshop** where you will deploy a database, secure access to it using **Vault**, and reveal a hidden message once your backend is properly **unlocked**.
+This repository contains the code and scripts for the **HUG Workshop** where you will deploy a database, 
+secure access to it using **Vault**, 
+and reveal a hidden message once your backend is properly **unlocked**.
 
 The goal is not to build a fancy app.  
 The goal is to prove that **access control matters** — and that your application should only speak when the *keeper* (Vault) is acknowledged.
@@ -144,6 +146,6 @@ Use the provided Terraform agent script and run everything through **HCP Terrafo
 If the data speaks without authorization, the system is lying to you.
 If the data remains silent until properly unlocked, you’re doing it right.
 
-Welcome to the workshop.
+Welcome to the workshop. We got fun and games.
 
 ```
