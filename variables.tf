@@ -1,16 +1,16 @@
 variable "tfe_organization" {
-  type = string
+  type    = string
   default = "HUGS_NL"
 }
 
-variable "projects_set" {
-  type = set(string)
-  default = ["Zero-Trust-Infrastructure", "HUG-Workshop"]
+variable "projects_prefix" {
+  type    = string
+  default = "project"
 }
 
-variable "teams_set" {
-  type = set(string)
-  default = ["DreamTeam"]
+variable "common_team_name" {
+  type    = string
+  default = "Contributors"
 }
 
 variable "users_set" {
