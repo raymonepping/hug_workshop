@@ -53,7 +53,6 @@ Use them to go deeper, faster, and cleaner.
 |---|---|
 | Understand *how* to configure something | Official Docs |
 | Understand *why* Vault/Terraform work like this | Chronicles |
-| Explain the architecture to someone else | Terraform VI + Vault VI |
 
 ---
 

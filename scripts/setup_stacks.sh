@@ -4,6 +4,9 @@
 # Usage: bash setup_stacks.sh [WORKDIR]
 # Example: bash setup_stacks.sh ~/work/hug-stacks
 
+# shellcheck disable=SC2034
+VERSION="1.0.0"
+
 set -euo pipefail
 
 WORKDIR="${1:-$PWD/hug-stacks}"

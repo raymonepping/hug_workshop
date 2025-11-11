@@ -2,6 +2,9 @@
 # clean_tf_artifacts.sh
 # Cleans Terraform artifacts and prepares repo for HCP Terraform Stacks
 
+# shellcheck disable=SC2034
+VERSION="1.0.0"
+
 set -euo pipefail
 
 echo "🧹 Removing local Terraform artifacts..."

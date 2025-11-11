@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# shellcheck disable=SC2034
+VERSION="1.0.0"
+
 # generate_dataset.sh
 # - Creates JSONL dataset with records: {"id":N,"idx":N,"title":"..."}
 # - The first letters of K titles (spaces ignored) encode the provided phrase.

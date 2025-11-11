@@ -9,6 +9,9 @@
 
 set -euo pipefail
 
+# shellcheck disable=SC2034
+VERSION="1.0.0"
+
 IMAGE="hashicorp/tfc-agent:1.25.1"
 NAME="tfc-agent"
 PLATFORM="linux/amd64"

@@ -1,0 +1,48 @@
+# Reusable bits
+x-common: &common
+  platform: linux/amd64
+  restart: unless-stopped
+  networks:
+    - workshop-net
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  backend:
+    <<: *common
+    image: repping/hug-backend:v1.0.0
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: pg
+      VAULT_ADDR: http://host.docker.internal:8200
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3004/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  frontend:
+    <<: *common
+    image: repping/hug-frontend:v1.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/public/config.json:/app/public/config.json:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5173 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  workshop-net:
+    external: true
