@@ -1,0 +1,460 @@
+{
+  "version": 4,
+  "terraform_version": "1.13.4",
+  "serial": 211,
+  "lineage": "750fb894-3fa9-4bb0-6102-5d1119527301",
+  "outputs": {
+    "contributors_team_id": {
+      "value": "team-1gvfjwqjJmr2qRQo",
+      "type": "string"
+    },
+    "granted_access_level": {
+      "value": "maintain",
+      "type": "string"
+    },
+    "project_names": {
+      "value": {
+        "cojan.vanballegooijen@hashicorp.com": "project_cojan_vanballegooijen",
+        "raymon.epping@hashicorp.com": "project_raymon_epping"
+      },
+      "type": [
+        "object",
+        {
+          "cojan.vanballegooijen@hashicorp.com": "string",
+          "raymon.epping@hashicorp.com": "string"
+        }
+      ]
+    },
+    "usernames": {
+      "value": {
+        "cojan.vanballegooijen@hashicorp.com": "cojan_vanballegooijen",
+        "raymon.epping@hashicorp.com": "raymon_epping"
+      },
+      "type": [
+        "map",
+        "string"
+      ]
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "tfe_team",
+      "name": "common",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "team-1gvfjwqjJmr2qRQo",
+            "name": "Contributors",
+            "organization": "HUGS_NL",
+            "sso_team_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "local_file",
+      "name": "persist_credentials",
+      "provider": "provider[\"registry.terraform.io/hashicorp/local\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "content": "{\"users\":{\"cojan.vanballegooijen@hashicorp.com\":{\"membership_id\":\"ou-MuWq1X3TMv831LMC\",\"user_id\":\"\",\"username\":\"cojan_vanballegooijen\"},\"raymon.epping@hashicorp.com\":{\"membership_id\":\"ou-QpvPFv7WCxVQu5zD\",\"user_id\":\"\",\"username\":\"raymon_epping\"}}}",
+            "content_base64": null,
+            "content_base64sha256": "rQvR1rNOfKfy6PRBkNBtIROS/+rmR4qj3pXU3nQP1uU=",
+            "content_base64sha512": "4Bu7U/UoCItzE+4sUzuooqLNh8y49pkdVRkgcSx+D9L/5dQ4kTq7OiWpgSYxJwMkbSQ8jTQH4DM9j7NmH0wmIA==",
+            "content_md5": "1192d9154be9f2be47de7d1c312960ea",
+            "content_sha1": "319140b96c892d65fe7538930a9607e9a214783c",
+            "content_sha256": "ad0bd1d6b34e7ca7f2e8f44190d06d211392ffeae6478aa3de95d4de740fd6e5",
+            "content_sha512": "e01bbb53f528088b7313ee2c533ba8a2a2cd87ccb8f6991d551920712c7e0fd2ffe5d438913abb3a25a98126312703246d243c8d3407e0333d8fb3661f4c2620",
+            "directory_permission": "0777",
+            "file_permission": "0777",
+            "filename": "./credentials.auto.tfvars.json",
+            "id": "319140b96c892d65fe7538930a9607e9a214783c",
+            "sensitive_content": null,
+            "source": null
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "sensitive_content"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "tfe_organization_membership.org_membership"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_organization_membership",
+      "name": "org_membership",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "email": "cojan.vanballegooijen@hashicorp.com",
+            "id": "ou-MuWq1X3TMv831LMC",
+            "organization": "HUGS_NL",
+            "user_id": "user-iUNDh2NvkVnyXAuN",
+            "username": "cojan"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "email": "raymon.epping@hashicorp.com",
+            "id": "ou-QpvPFv7WCxVQu5zD",
+            "organization": "HUGS_NL",
+            "user_id": "user-HudBUuwbFmmZua1m",
+            "username": "RaymonEpping"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_project",
+      "name": "user_project",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "auto_destroy_activity_duration": null,
+            "description": "",
+            "id": "prj-NMDwy2dq5iiJENWE",
+            "ignore_additional_tags": null,
+            "name": "project_cojan_vanballegooijen",
+            "organization": "HUGS_NL",
+            "tags": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "auto_destroy_activity_duration": null,
+            "description": "",
+            "id": "prj-PP8kYXw49CEvMM8h",
+            "ignore_additional_tags": null,
+            "name": "project_raymon_epping",
+            "organization": "HUGS_NL",
+            "tags": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_team",
+      "name": "personal",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "allow_member_token_management": true,
+            "id": "team-zrzcCMCAbMk8jS4Z",
+            "name": "team_cojan_vanballegooijen",
+            "organization": "HUGS_NL",
+            "organization_access": [
+              {
+                "access_secret_teams": false,
+                "manage_agent_pools": false,
+                "manage_membership": false,
+                "manage_modules": false,
+                "manage_organization_access": false,
+                "manage_policies": false,
+                "manage_policy_overrides": false,
+                "manage_projects": false,
+                "manage_providers": false,
+                "manage_run_tasks": false,
+                "manage_teams": false,
+                "manage_vcs_settings": false,
+                "manage_workspaces": false,
+                "read_projects": false,
+                "read_workspaces": false
+              }
+            ],
+            "sso_team_id": "",
+            "visibility": "secret"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "allow_member_token_management": true,
+            "id": "team-VWoUEAVZcb4nVwEQ",
+            "name": "team_raymon_epping",
+            "organization": "HUGS_NL",
+            "organization_access": [
+              {
+                "access_secret_teams": false,
+                "manage_agent_pools": false,
+                "manage_membership": false,
+                "manage_modules": false,
+                "manage_organization_access": false,
+                "manage_policies": false,
+                "manage_policy_overrides": false,
+                "manage_projects": false,
+                "manage_providers": false,
+                "manage_run_tasks": false,
+                "manage_teams": false,
+                "manage_vcs_settings": false,
+                "manage_workspaces": false,
+                "read_projects": false,
+                "read_workspaces": false
+              }
+            ],
+            "sso_team_id": "",
+            "visibility": "secret"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_team_organization_members",
+      "name": "personal_team_members",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "id": "team-zrzcCMCAbMk8jS4Z",
+            "organization_membership_ids": [
+              "ou-MuWq1X3TMv831LMC"
+            ],
+            "team_id": "team-zrzcCMCAbMk8jS4Z"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "tfe_organization_membership.org_membership",
+            "tfe_team.personal"
+          ]
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 0,
+          "attributes": {
+            "id": "team-VWoUEAVZcb4nVwEQ",
+            "organization_membership_ids": [
+              "ou-QpvPFv7WCxVQu5zD"
+            ],
+            "team_id": "team-VWoUEAVZcb4nVwEQ"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "tfe_organization_membership.org_membership",
+            "tfe_team.personal"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_team_project_access",
+      "name": "contributors_access",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 1,
+          "attributes": {
+            "access": "maintain",
+            "id": "tprj-xbB4e92LCBbxfnRc",
+            "project_access": [
+              {
+                "settings": "read",
+                "teams": "none",
+                "variable_sets": "write"
+              }
+            ],
+            "project_id": "prj-NMDwy2dq5iiJENWE",
+            "team_id": "team-1gvfjwqjJmr2qRQo",
+            "workspace_access": [
+              {
+                "create": true,
+                "delete": true,
+                "locking": true,
+                "move": false,
+                "run_tasks": true,
+                "runs": "apply",
+                "sentinel_mocks": "read",
+                "state_versions": "write",
+                "variables": "write"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "data.tfe_team.common",
+            "tfe_project.user_project"
+          ]
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 1,
+          "attributes": {
+            "access": "maintain",
+            "id": "tprj-KBLudjjvVtVnAXT5",
+            "project_access": [
+              {
+                "settings": "read",
+                "teams": "none",
+                "variable_sets": "write"
+              }
+            ],
+            "project_id": "prj-PP8kYXw49CEvMM8h",
+            "team_id": "team-1gvfjwqjJmr2qRQo",
+            "workspace_access": [
+              {
+                "create": true,
+                "delete": true,
+                "locking": true,
+                "move": false,
+                "run_tasks": true,
+                "runs": "apply",
+                "sentinel_mocks": "read",
+                "state_versions": "write",
+                "variables": "write"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "data.tfe_team.common",
+            "tfe_project.user_project"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tfe_team_project_access",
+      "name": "personal_access",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfe\"]",
+      "instances": [
+        {
+          "index_key": "cojan.vanballegooijen@hashicorp.com",
+          "schema_version": 1,
+          "attributes": {
+            "access": "maintain",
+            "id": "tprj-AQ8ytVpasZKbcedV",
+            "project_access": [
+              {
+                "settings": "read",
+                "teams": "none",
+                "variable_sets": "write"
+              }
+            ],
+            "project_id": "prj-NMDwy2dq5iiJENWE",
+            "team_id": "team-zrzcCMCAbMk8jS4Z",
+            "workspace_access": [
+              {
+                "create": true,
+                "delete": true,
+                "locking": true,
+                "move": false,
+                "run_tasks": true,
+                "runs": "apply",
+                "sentinel_mocks": "read",
+                "state_versions": "write",
+                "variables": "write"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "tfe_project.user_project",
+            "tfe_team.personal"
+          ]
+        },
+        {
+          "index_key": "raymon.epping@hashicorp.com",
+          "schema_version": 1,
+          "attributes": {
+            "access": "maintain",
+            "id": "tprj-y4g2pT7owzWPKDXj",
+            "project_access": [
+              {
+                "settings": "read",
+                "teams": "none",
+                "variable_sets": "write"
+              }
+            ],
+            "project_id": "prj-PP8kYXw49CEvMM8h",
+            "team_id": "team-VWoUEAVZcb4nVwEQ",
+            "workspace_access": [
+              {
+                "create": true,
+                "delete": true,
+                "locking": true,
+                "move": false,
+                "run_tasks": true,
+                "runs": "apply",
+                "sentinel_mocks": "read",
+                "state_versions": "write",
+                "variables": "write"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "tfe_project.user_project",
+            "tfe_team.personal"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -1,70 +1,136 @@
-# 1) Invite users into the org (this sends the invite if they’re not yet members)
-resource "tfe_organization_membership" "org_membership" {
-  for_each     = local.users
-  organization = var.tfe_organization
-  email        = each.key
+provider "tfe" {}
+
+########################################
+# Load bootstrap emails (if file exists)
+########################################
+locals {
+  bootstrap_obj    = try(jsondecode(file("${path.module}/bootstrap.json")), { emails = [] })
+  bootstrap_emails = toset([for e in local.bootstrap_obj.emails : lower(e)])
 }
 
-# 2) Create a common team (Contributors) and add ALL users to it
-resource "tfe_team" "common" {
+########################################
+# Mode selection & username derivation
+########################################
+locals {
+  using_locked = false # true
+
+  # Effective email set:
+  # - locked mode: keys of var.users
+  # - bootstrap mode: emails from bootstrap.json
+  effective_emails = local.using_locked ? toset(keys(var.users)) : local.bootstrap_emails
+
+  # Derive usernames:
+  # - locked: provided via var.users
+  # - bootstrap: sanitize local-part (., +, -) -> _
+  usernames = (
+    local.using_locked ?
+    { for e, u in var.users : e => u.username } :
+    { for e in local.effective_emails :
+      e => replace(replace(replace(lower(element(split("@", e), 0)), ".", "_"), "+", "_"), "-", "_")
+    }
+  )
+}
+
+########################################
+# Common team (by name or ID override)
+########################################
+data "tfe_team" "common" {
+  count        = var.existing_team_id == "" ? 1 : 0
   name         = var.common_team_name
   organization = var.tfe_organization
+}
 
-  organization_access {
-    manage_vcs_settings = true
-    read_workspaces     = false
-    read_projects       = false
-    manage_workspaces   = false
-    manage_projects     = false
+locals {
+  common_team_id = var.existing_team_id != "" ? var.existing_team_id : data.tfe_team.common[0].id
+}
+
+########################################
+# Bootstrap memberships (now always declared)
+########################################
+locals {
+  org_membership_map = local.using_locked ? { for email in local.effective_emails : email => email } : { for email in local.effective_emails : email => email }
+}
+
+resource "tfe_organization_membership" "org_membership" {
+  for_each     = local.org_membership_map
+  organization = var.tfe_organization
+  email        = each.key
+
+  lifecycle {
+    ignore_changes  = [email]
+    prevent_destroy = true
   }
 }
 
-resource "tfe_team_organization_members" "common_team_members" {
-  team_id = tfe_team.common.id
-  # all org membership ids
-  organization_membership_ids = [
-    for email, _username in local.users :
-    tfe_organization_membership.org_membership[email].id
-  ]
+# Resolve IDs for both modes
+locals {
+  membership_ids = (
+    local.using_locked
+    ? { for e, u in var.users : e => u.membership_id }
+    : { for e, m in tfe_organization_membership.org_membership : e => m.id }
+  )
+  user_ids = (
+    local.using_locked
+    ? { for e, u in var.users : e => try(u.user_id, "") }
+    : { for e in local.effective_emails : e => "" }
+  )
 }
 
-# Optional: create a token for the common team if you need automation scoped to it
-resource "tfe_team_token" "common_team_token" {
-  team_id     = tfe_team.common.id
-  description = "Common team token"
-}
-
-# 3) For each user, create a dedicated project: project_<username>
+########################################
+# Per-user project, per-user team
+########################################
 resource "tfe_project" "user_project" {
-  for_each     = local.users
+  for_each     = local.usernames
   organization = var.tfe_organization
   name         = "${var.projects_prefix}_${each.value}"
 }
 
-# 4) Per-user team (contains only that user) with maintainer/admin on their project
 resource "tfe_team" "personal" {
-  for_each     = local.users
-  name         = "team_${each.value}"        # e.g., team_repping
+  for_each     = local.usernames
   organization = var.tfe_organization
+  name         = "${var.personal_team_prefix}_${each.value}"
 }
 
 resource "tfe_team_organization_members" "personal_team_members" {
-  for_each = local.users
+  for_each = local.usernames
   team_id  = tfe_team.personal[each.key].id
-  organization_membership_ids = [
-    tfe_organization_membership.org_membership[each.key].id
-  ]
+
+  organization_membership_ids = [local.membership_ids[each.key]]
 }
 
-# 5) Grant the per-user team access to the per-user project
-# Note: In the tfe provider this is typically `tfe_project_team_access` with an `access` level.
-# Valid values commonly include: "admin", "maintain", "write", "read" (check your provider version).
-# Use "maintain" (or "admin") so the user can create/manage workspaces within the project.
-resource "tfe_project_team_access" "personal_access" {
-  for_each   = local.users
-  project_id = tfe_project.user_project[each.key].id
+# Personal team -> their project
+resource "tfe_team_project_access" "personal_access" {
+  for_each   = local.usernames
   team_id    = tfe_team.personal[each.key].id
+  project_id = tfe_project.user_project[each.key].id
+  access     = "maintain"
+}
 
-  access = "maintain"
-  # If your provider version uses different names, swap to a valid one (e.g., "admin").
+# Optional: common team -> each project
+resource "tfe_team_project_access" "contributors_access" {
+  for_each   = var.enable_common_access ? local.usernames : {}
+  team_id    = local.common_team_id
+  project_id = tfe_project.user_project[each.key].id
+  access     = "maintain"
+}
+
+########################################
+# Persist credentials for steady-state
+########################################
+locals {
+  users_to_persist = local.using_locked ? var.users : {
+    for e in local.effective_emails : e => {
+      username      = local.usernames[e]
+      membership_id = local.membership_ids[e]
+      user_id       = local.user_ids[e]
+    }
+  }
+}
+
+resource "local_file" "persist_credentials" {
+  count    = local.using_locked || !var.write_credentials_file ? 0 : 1
+  filename = "${path.module}/credentials.auto.tfvars.json"
+  content = jsonencode({
+    users = local.users_to_persist
+  })
 }
