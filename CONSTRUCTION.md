@@ -113,16 +113,18 @@ If Vault is configured and reachable, channel will flip automatically.
 5) Understanding the Environment Logic
 
 The backend connects to DB based on this env:
-
+```
 backend/.env
-
+```
 Important values:
 
+```
 Key	Meaning	Typical Value
 DB_HOST	Name of DB container on Docker network	pg, mysql, or mongo
 DB_AUTH_MODE	How to authenticate	preferred (= try Vault → fallback env)
 DB_CRED_SOURCE	Cred lookup style	kv or dynamic
 VAULT_ADDR	URL Vault is reachable from inside container	http://host.docker.internal:8200
+```
 
 When Vault is not available → falls back cleanly to .env credentials.
 When Vault is reachable → credentials are retrieved securely.
@@ -133,20 +135,24 @@ No drama. No guessing. Transparency is intentional.
 
 6) Verify Your Dataset (The Codex Test)
 
+```
 ./scripts/seed_dataset.sh verify --db-type postgres --limit 32
+```
 
 Example output:
 
+```
 🔓 Verification unlocked: Vault reachable and token valid.
 
 🛡️  Guardian acknowledged.
 ✨ The initials reveal themselves:
 🔐 Codex: ------------------------
+```
 
 If Vault is missing:
-
+```
 🔒 Verification locked
-
+```
 Exactly as intended.
 
 ⸻
