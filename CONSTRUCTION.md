@@ -8,7 +8,7 @@ This document explains how to:
 4. Prepare for the next phase → **Terraform + Vault + Boundary**
 
 This is the *hands-on assembly manual*, not the story.  
-Think: *LEGO booklet, but with slightly better taste and fewer screaming children.*
+Think: **LEGO booklet, but with slightly better taste and fewer screaming children.**
 
 ---
 
