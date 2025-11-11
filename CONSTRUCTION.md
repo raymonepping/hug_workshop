@@ -105,7 +105,7 @@ You’ll see something like:
   "channel": "env",
   "unlocked": true
 }
-
+```
 If Vault is configured and reachable, channel will flip automatically.
 
 ⸻
