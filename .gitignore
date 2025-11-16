@@ -147,3 +147,14 @@ crash.log
 *.tfstate
 *.tfstate.backup*.backup
 .bootstrap.auto.tfvars.json
+convert_2_json.sh
+tickets.csv
+tickets*.json
+tickets_extended.json
+convert_2_tfvars.sh
+attendees.auto.tfvars.json
+
+# Ignore all Terraform config files
+*.tf
+*.tfvars
+*.tfstate*

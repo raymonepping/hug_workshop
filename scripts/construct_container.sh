@@ -16,7 +16,7 @@ VERSION="1.0.0"
 # Flags:
 #   --backend-dir DIR         (required)
 #   --frontend-dir DIR        (required)
-#   --repo NAME               (dockerhub namespace; falls back to $DOCKERHUB_REPO)
+#   --repo NAME               (dockerhub namespace; falls back to \$DOCKERHUB_REPO)
 #   --version V               (e.g., v1.1.0; optional)
 #   --platform PLATFORMS      (e.g., linux/amd64 or linux/amd64,linux/arm64)
 #   --push true|false         (default: false)
@@ -26,8 +26,8 @@ VERSION="1.0.0"
 #   --provenance true|false   (default: true; adds attestation)
 #
 # Outputs:
-#   reppo/hug-backend:<version>   and optionally :latest
-#   repo/hug-frontend:<version>   and optionally :latest
+#   repo/hug-backend:<version>   and optionally :latest
+#   repo/hug-frontend:<version>  and optionally :latest
 #
 # Notes:
 #  - If multi-arch and not pushing, buildx cannot --load multi-arch into docker; we enforce --push.
@@ -42,11 +42,89 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 #   2) project root fallback
 if [[ -f "${SCRIPT_DIR}/.env" ]]; then
   # .env lives next to this script
+  # shellcheck disable=SC1090
   source "${SCRIPT_DIR}/.env"
 elif [[ -f "${ROOT_DIR}/.env" ]]; then
   # fallback to project root
+  # shellcheck disable=SC1090
   source "${ROOT_DIR}/.env"
 fi
+
+die() { echo "❌ $*" >&2; exit 1; }
+
+print_help() {
+  cat <<EOF
+$(basename "$0") v${VERSION}
+Build and optionally push backend & frontend images with docker buildx.
+
+Usage:
+  $(basename "$0") \\
+    --backend-dir DIR \\
+    --frontend-dir DIR \\
+    [--repo NAME] \\
+    [--version V] \\
+    [--platform PLATFORMS] \\
+    [--push true|false] \\
+    [--latest true|false] \\
+    [--multiarch true|false] \\
+    [--sbom true|false] \\
+    [--provenance true|false]
+
+Required:
+  --backend-dir DIR         Backend project directory (contains Dockerfile)
+  --frontend-dir DIR        Frontend project directory (contains Dockerfile)
+
+Optional:
+  --repo NAME               Docker Hub namespace (e.g. repping).
+                            Defaults to \$DOCKERHUB_REPO from .env if set.
+  --version V               Image version/tag (default: \$VERSION or v1.0.0)
+  --platform PLATFORMS      e.g. linux/amd64 or linux/amd64,linux/arm64.
+                            If omitted:
+                              - On arm64 hosts → defaults to linux/amd64
+                              - Else → native platform
+  --push true|false         Push images to registry (default: false)
+  --latest true|false       Also tag :latest (default: false)
+  --multiarch true|false    Build multi-arch manifest (default: false)
+                            Implies --platform linux/amd64,linux/arm64.
+  --sbom true|false         Attach SBOM attestation (default: true)
+  --provenance true|false   Attach provenance attestation (default: true)
+
+Meta:
+  -h, --help                Show this help and exit
+  -V, --version             Show version and exit
+
+Outputs:
+  \${repo}/hug-backend:<version>      (and optionally :latest)
+  \${repo}/hug-frontend:<version>     (and optionally :latest)
+
+Notes:
+  - Multi-arch builds require --push (buildx cannot --load multi-platform).
+  - Single-arch + --push=false uses --load to import into local docker.
+  - No secrets are baked:
+      * Backend: pass env via --env-file at runtime.
+      * Frontend: mount config.json (e.g. apiBase) into the container.
+
+Examples:
+
+  # Simple local build (single-arch, no push)
+  $(basename "$0") \\
+    --backend-dir ./backend \\
+    --frontend-dir ./frontend \\
+    --repo repping \\
+    --version v1.2.3
+
+  # Multi-arch build with push, latest tag, SBOM & provenance
+  $(basename "$0") \\
+    --backend-dir ./backend \\
+    --frontend-dir ./frontend \\
+    --repo repping \\
+    --version v1.2.3 \\
+    --multiarch true \\
+    --push true \\
+    --latest true
+
+EOF
+}
 
 # ---- defaults ----
 BACKEND_DIR=""
@@ -59,8 +137,6 @@ LATEST="false"
 MULTIARCH="false"
 SBOM="${SBOM:-true}"
 PROVENANCE="${PROVENANCE:-true}"
-
-die(){ echo "❌ $*" >&2; exit 1; }
 
 # ---- args ----
 args=("$@"); i=0
@@ -78,9 +154,16 @@ while [[ $i -lt ${#args[@]} ]]; do
     --sbom)          SBOM="${args[$((i+1))]:-}"; i=$((i+2));;
     --provenance)    PROVENANCE="${args[$((i+1))]:-}"; i=$((i+2));;
     -h|--help)
-      sed -n '1,120p' "$0" | sed '1,15d'; exit 0;;
+      print_help
+      exit 0
+      ;;
+    -V|--version|--ver)
+      echo "$(basename "$0") v${VERSION}"
+      exit 0
+      ;;
     *)
-      die "Unknown arg: $a (use --help)";;
+      die "Unknown arg: $a (use --help)";
+      ;;
   esac
 done
 
