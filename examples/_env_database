@@ -1,0 +1,27 @@
+# --- HashiCorp Vault Parameters ---
+VAULT_ADDR=
+VAULT_TOKEN=
+VAULT_DB_KV_PATH=kv/workshop
+
+# one of: postgres | mysql | mongo | couchbase
+DB_TYPE=couchbase
+
+# network-level connection (used only if not docker-exec’ing)
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=workshop
+
+# credentials (can be overridden by --user/--password)
+DB_USER=workshop
+DB_PASSWORD=workshop
+
+# container names (already running from Step 1)
+PG_CONTAINER=pg
+MYSQL_CONTAINER=mysql
+MONGO_CONTAINER=mongo
+CB_CONTAINER=couchbase_hug
+
+# couchbase specifics
+CB_BUCKET=workshop
+CB_SCOPE=app
+CB_COLLECTION=messages
