@@ -88,6 +88,60 @@ STATUS=$?
 set -e
 
 if (( STATUS != 0 )); then
+  if echo "${JSON_OUTPUT}" | grep -qi "wrapping token is not valid"; then
+    echo "❌ Wrapping token is expired, not valid, or does not exist." >&2
+    echo "ℹ️  You can request or generate a new wrapped token." >&2
+
+    # interactive prompt
+    read -r -p "🔄 Do you want to issue a new wrapped token now? (y/n): " ANSWER
+
+    case "$ANSWER" in
+      y|Y)
+        echo "➡️  Issuing new wrapped token..."
+        echo "   VAULT_NAMESPACE=${VAULT_NAMESPACE:-<unset>}"
+        echo ""
+
+        # Execute the wrap request
+        set +e
+        NEW_WRAP_JSON="$(vault kv get -wrap-ttl=60m -format=json secret/story 2>&1)"
+        NEW_STATUS=$?
+        set -e
+
+        if (( NEW_STATUS != 0 )); then
+          echo "❌ Failed to generate a new wrapped token." >&2
+          echo "${NEW_WRAP_JSON}" >&2
+          exit 3
+        fi
+
+        NEW_TOKEN="$(echo "$NEW_WRAP_JSON" | jq -r '.wrap_info.token // empty')"
+
+        if [[ -z "$NEW_TOKEN" || "$NEW_TOKEN" == "null" ]]; then
+          echo "❌ Vault did not return a wrapped token." >&2
+          echo "${NEW_WRAP_JSON}" >&2
+          exit 4
+        fi
+
+        echo "✅ New wrapped token issued:"
+        echo ""
+        echo "   ${NEW_TOKEN}"
+        echo ""
+        echo "👉 You can now run:"
+        echo "   WRAPPED_TOKEN=${NEW_TOKEN} ./unwrap_story.sh"
+        exit 0
+        ;;
+
+      n|N)
+        echo "ℹ️  No new token issued. Exiting."
+        exit 2
+        ;;
+
+      *)
+        echo "❌ Invalid choice. Exiting."
+        exit 2
+        ;;
+    esac
+  fi
+
   echo "❌ Error unwrapping token:" >&2
   echo "${JSON_OUTPUT}" >&2
   exit $STATUS
