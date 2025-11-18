@@ -23,6 +23,7 @@ variables.tf
 outputs.tf
 versions.tf
 locked_users.auto.tfvars
+credentials_pretty.json
 
 ########################################
 # 💻 IDE & Editor Configs

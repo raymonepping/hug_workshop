@@ -10,6 +10,7 @@ Use them to go deeper, faster, and cleaner.
 | Tool | Purpose | Link |
 |---|---|---|
 | **Terraform** | Infrastructure as Code | https://developer.hashicorp.com/terraform/docs |
+| **Terraform Agents** | Terraform Agents | https://developer.hashicorp.com/terraform/cloud-docs/agents |
 | **Vault** | Secrets Management / Encryption / Auth | https://developer.hashicorp.com/vault/docs |
 
 ---
