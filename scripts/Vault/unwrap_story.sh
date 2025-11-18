@@ -3,20 +3,20 @@ set -euo pipefail
 
 # unwrap_story.sh
 #
-# Usage:
-#   ./unwrap_story.sh <wrapped_token>
-#   WRAPPED_TOKEN=<wrapped_token> ./unwrap_story.sh
-#   echo <wrapped_token> | ./unwrap_story.sh
+# Usage (from repo root):
+#   ./Vault/unwrap_story.sh <wrapped_token>
+#   WRAPPED_TOKEN=<wrapped_token> ./Vault/unwrap_story.sh
+#   echo <wrapped_token> | ./Vault/unwrap_story.sh
 #
 # Requires: vault
 # Optional: jq (for pretty output)
 
 usage() {
-  cat <<EOF
+  cat <<'EOF'
 Usage:
-  $0 <wrapped_token>
-  WRAPPED_TOKEN=<wrapped_token> $0
-  echo <wrapped_token> | $0
+  ././Vault/unwrap_story.sh <wrapped_token>
+  WRAPPED_TOKEN=<wrapped_token> ././Vault/unwrap_story.sh
+  echo <wrapped_token> | ././Vault/unwrap_story.sh
 
 The script will try, in order:
   1) First argument
@@ -126,7 +126,7 @@ if (( STATUS != 0 )); then
         echo "   ${NEW_TOKEN}"
         echo ""
         echo "👉 You can now run:"
-        echo "   WRAPPED_TOKEN=${NEW_TOKEN} ./unwrap_story.sh"
+        echo "   WRAPPED_TOKEN=${NEW_TOKEN} ./Vault/unwrap_story.sh"
         exit 0
         ;;
 
