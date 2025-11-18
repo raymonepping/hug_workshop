@@ -3,6 +3,8 @@
 This page collects the **official docs** and **field-tested articles** that will help you during (and after) the workshop.  
 Use them to go deeper, faster, and cleaner.
 
+> Looking for my script references? See **[SCRIPTS.md](./SCRIPTS.md)**.
+
 ---
 
 ## 🛠 Official Documentation
