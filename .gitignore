@@ -132,7 +132,6 @@ docker-compose.override.yml
 .database.env
 .*.env
 .env.*
-dataset.jsonl
 lines.txt
 
 ########################################

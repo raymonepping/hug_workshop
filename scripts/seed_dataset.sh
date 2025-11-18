@@ -89,6 +89,7 @@ CB_COLLECTION="${CB_COLLECTION:-messages}"
 
 DATASET_ENC="${DATASET_ENC:-dataset.jsonl.enc}"
 DATASET_PASSPHRASE="${DATASET_PASSPHRASE:-}"
+DATASET_PLAIN="${DATASET_PLAIN:-}"
 
 QUIET="${QUIET:-1}"  # default quiet
 LIMIT="${LIMIT:-}"   # verify limit
@@ -229,6 +230,11 @@ while [[ $i -lt ${#args[@]} ]]; do
     i=$((i + 2))
     ;;
 
+  --plain-file|--dataset)
+    DATASET_PLAIN="${args[$((i + 1))]:-}"
+    i=$((i + 2))
+    ;;
+
   --quiet)
     QUIET=1
     i=$((i + 1))
@@ -282,16 +288,29 @@ done
 case "$DB_TYPE" in postgres | mysql | mongo | couchbase) ;; *) die "Unsupported DB_TYPE: $DB_TYPE" ;; esac
 
 decrypt_to_tmp() {
-  local enc="${1:-$DATASET_ENC}"
-  [[ -f "$enc" ]] || die "Encrypted dataset not found: $enc"
+  local src="${1:-$DATASET_ENC}"
   local tmp
   tmp="$(mktemp)"
-  if [[ -n "$DATASET_PASSPHRASE" ]]; then
-    openssl aes-256-cbc -d -salt -pbkdf2 -in "$enc" -out "$tmp" -pass pass:"$DATASET_PASSPHRASE"
-  else
-    echo "🔐 Enter passphrase to decrypt $enc"
-    openssl aes-256-cbc -d -salt -pbkdf2 -in "$enc" -out "$tmp"
+
+  # If a plain dataset is provided, just copy it into a temp file.
+  if [[ -n "${DATASET_PLAIN:-}" ]]; then
+    [[ -f "$DATASET_PLAIN" ]] || die "Plain dataset not found: $DATASET_PLAIN"
+    cp "$DATASET_PLAIN" "$tmp"
+    [[ -s "$tmp" ]] || die "Plain dataset produced empty output."
+    echo "$tmp"
+    return 0
   fi
+
+  # Normal encrypted path
+  [[ -f "$src" ]] || die "Encrypted dataset not found: $src"
+
+  if [[ -n "$DATASET_PASSPHRASE" ]]; then
+    openssl aes-256-cbc -d -salt -pbkdf2 -in "$src" -out "$tmp" -pass pass:"$DATASET_PASSPHRASE"
+  else
+    echo "🔐 Enter passphrase to decrypt $src"
+    openssl aes-256-cbc -d -salt -pbkdf2 -in "$src" -out "$tmp"
+  fi
+
   [[ -s "$tmp" ]] || die "Decryption produced empty output."
   echo "$tmp"
 }
