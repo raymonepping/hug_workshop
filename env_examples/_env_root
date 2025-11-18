@@ -1,0 +1,3 @@
+# Terraform Enterprise Variables
+TFE_TOKEN=
+TFE_HOST=app.terraform.io
