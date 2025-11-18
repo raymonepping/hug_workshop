@@ -1,0 +1,8 @@
+# What backend the viewer should call
+FRONTEND_API_BASE=http://localhost:3004
+
+# Port to serve this static frontend
+PORT=5173
+
+# How many items to show by default
+ITEMS_LIMIT=32

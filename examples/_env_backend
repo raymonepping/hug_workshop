@@ -1,0 +1,28 @@
+# --- DB selection ---
+DB_TYPE=postgres                # one of: postgres | mysql | mongo | couchbase
+DB_NAME=workshop
+DB_HOST=pg                      # for local dev use 'localhost' or '127.0.0.1'
+DB_PORT=5432                    # For couchbase use 5432, for mysql use 3307
+
+# --- Auth gating (readable, not giveaway) ---
+DB_AUTH_MODE=preferred          # required | preferred | env_only
+DB_SECONDARY_MODE=env_fallback  # disabled | env_fallback  (only used if DB_AUTH_MODE=preferred)
+DB_TLS=false
+DB_CRED_SOURCE=kv               # kv | dynamic
+
+# Known creds for the workshop DB
+DB_USERNAME=
+DB_PASSWORD=
+
+# default + cap
+DEFAULT_ITEMS_LIMIT=32
+MAX_ITEMS_LIMIT=100
+
+# --- HashiCorp Vault Parameters ---
+VAULT_ADDR=
+VAULT_TOKEN=
+VAULT_DB_KV_PATH=kv/workshop
+
+# Dynamic (only if DB_CRED_SOURCE=dynamic)
+VAULT_DB_MOUNT=database         # mount name for DB secrets engine
+VAULT_DB_ROLE=workshop-role     # role that issues db creds
