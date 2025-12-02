@@ -144,6 +144,4 @@ tickets_extended.json
 convert_2_tfvars.sh
 
 # Ignore all Terraform config files
-*.tf
-*.tfvars
 *.tfstate*
