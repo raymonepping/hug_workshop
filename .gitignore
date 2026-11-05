@@ -145,3 +145,10 @@ convert_2_tfvars.sh
 
 # Ignore all Terraform config files
 *.tfstate*
+
+# Generated workshop material; synthetic fixtures belong in workshop/ instead.
+.workshop/
+credentials/
+scripts/output/
+scripts/attendees.auto.tfvars.json
+*.tfplan

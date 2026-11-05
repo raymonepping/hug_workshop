@@ -1,6 +1,13 @@
 # HUG Workshop — **Unlock the Data**
 
-> Looking for deep-dive references? See **[ARTICLE_INDEX.md](./ARTICLE_INDEX.md)**.
+> **Revision in preparation:** the next workshop will run locally with Terraform,
+> Ansible, Make, and fictional users `albert`, `brenda`, and `charlie`.
+> See the [new PRD](./docs/PRD.md), [implementation prompts](./prompts/README.md),
+> and [cleanup record](./docs/CLEANUP.md). The implementation below and the older
+> workshop guides still describe the previous version; the local variant is not
+> implemented yet.
+
+> Looking for deep-dive references? See **[ARTICLE_INDEX.md](./docs/ARTICLE_INDEX.md)**.
 
 ---
 
@@ -116,7 +123,7 @@ No copy/paste config magic. Use logic. Understand what you're doing.
 This README is orientation only.
 The full workshop challenge, scoring, and step-by-step is here:
 
-👉 **[EXERCISE.md](./EXERCISE.md)**
+👉 **[EXERCISE.md](./docs/EXERCISE.md)**
 
 Read it. Follow it.
 Winning requires understanding, not just assembling parts.
