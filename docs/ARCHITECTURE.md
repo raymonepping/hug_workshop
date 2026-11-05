@@ -60,3 +60,9 @@ They are not operator overrides: changing them requires updating the DB/Vault ro
 and backend contract together. Instance names, prefixes, ports, profile, edition
 and image choices provide the reusable environment controls. A temporary prefixed
 Podman test container is a test process, not a competing persistent service owner.
+
+## Viewer presentation
+
+The static viewer uses the Vault daylight glass visual family shared by the
+local Vault reference projects. See [UI design](UI_DESIGN.md) for visual tokens,
+font provenance, responsive behavior and the authorization state map.

@@ -4,10 +4,20 @@ test('real Vault unlock, private path denial, and responsive viewer', async ({ p
   await expect(page.locator('#items tr')).toHaveCount(32);
   await expect(page.locator('#reveal')).toHaveText('WEARETHEGUARDIANSOFOUROWNSYSTEMS');
   for (const path of ['/frontend.js', '/package.json', '/.env', '/node_modules/express/package.json']) expect((await request.get(path)).status()).toBe(404);
-  await page.locator('#api').fill('http://r'); await expect(page.locator('#api')).toHaveValue('http://r');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('link', { name: 'Message fragments' }).click();
+  await expect(page).toHaveURL(/#fragments$/);
+  await page.getByRole('link', { name: 'HUG Workshop' }).click();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: '../../.workshop/viewer-desktop.png', fullPage: true });
+  for (const asset of ['/fonts/hanken-grotesk-latin-wght-normal.woff2', '/fonts/jetbrains-mono-latin-wght-normal.woff2', '/mark.svg']) expect((await request.get(asset)).status()).toBe(200);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('#refresh')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByText('Health details', { exact: false }).click();
+  await expect(page.locator('#health')).toBeVisible();
   await page.screenshot({ path: '../../.workshop/viewer-mobile.png', fullPage: true });
+  await page.locator('#api').fill('http://r'); await expect(page.locator('#api')).toHaveValue('http://r');
 });
 test('baseline is explicit; lock/error clears old data; all fields are escaped', async ({ page }) => {
   let state = { ok: true, dbReady: true, mode: 'required', channel: 'vault-kv', unlocked: true, state: 'ready' };

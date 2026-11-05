@@ -198,3 +198,21 @@ persona and app credential values were checked absent from tracked content and
 all default service log/config-environment output without printing those values.
 The temporary check instance was destroyed afterward; only default's four project
 containers remain. Its viewer is http://127.0.0.1:15173 with the intentional learner lock.
+
+## UI refresh: Vault daylight glass
+
+The workshop viewer now shares the visual family of `vault_dance` and
+`vault_crypto`. Scoped Podman builds and Terraform applies passed against the
+licensed default instance. Both Chromium tests pass at the final UI build:
+real AppRole unlock and 32-row reveal, static private-path denials, local font
+and SVG delivery, section navigation, expandable health details, API input
+shortcut handling, and no horizontal page overflow at 390px. Intercepted API
+checks retain baseline labelling, denial/error clearing and hostile HTML escaping.
+
+Desktop (1440px) and phone (390px) screenshots were inspected. Numeric IDs were
+adjusted to remain on one line on phones. Screenshots remain private under
+`.workshop/viewer-desktop.png` and `.workshop/viewer-mobile.png`. This is browser
+regression and visual evidence, not a full automated accessibility audit.
+
+The default lab was restored to `PROFILE=starter`; its final health response
+reports `exercise_incomplete`, `unlocked=false`, with the updated viewer served.
