@@ -270,7 +270,7 @@ def destroy(c):
 
 
 def status(c):
-    from verify import request
+    from HashiCorp.Vault.hug_workshop.scripts.verify import request
     path=Path(c['runtime'])/'metadata.json'
     if not path.exists():raise ValueError('No deployed instance; run make up first')
     meta=json.loads(path.read_text());code,data=request(meta['urls']['backend'],'/health')
@@ -280,7 +280,7 @@ def status(c):
 
 
 def persona(c):
-    from verify import request
+    from HashiCorp.Vault.hug_workshop.scripts.verify import request
     user=os.environ.get('USER_NAME','albert');action=os.environ.get('ACTION','read')
     if user not in ['albert','brenda','charlie'] or action not in ['read','write','admin']:raise ValueError('USER_NAME=albert|brenda|charlie, ACTION=read|write|admin')
     d=Path(c['runtime']);base=json.loads((d/'metadata.json').read_text())['urls']['vault']
