@@ -93,3 +93,108 @@ Application lockfiles were refreshed and both clean npm installs passed after
 removing unused dotenv. The incomplete-error unit fixture now injects that error
 so completing a learner file will not make unrelated unit tests fail. A real
 fresh-clone starter checkpoint is checked separately in stage 8.
+
+## Stage 8 — current acceptance
+
+Acceptance candidate application source: commit `1baac15`. The final record below
+includes the source-operation lock added to the fresh-checkout harness. All dates
+in this document use 5 November 2026, Europe/Amsterdam.
+
+Executed commands and results:
+
+| Command/check | Result |
+| --- | --- |
+| `python3 -m unittest discover -s tests -v` | 8 Python contract/safety tests pass |
+| `make test INSTANCE=default` | Python suite and 7 backend tests in native ARM64 Podman pass |
+| `make verify INSTANCE=default` with explicit solution | Full real-service verifier passes on Enterprise 2.2.1 |
+| `make infra INSTANCE=default PROFILE=starter AUTO_APPROVE=1` | Restores intentional learner lock; status reports exercise_incomplete |
+| `python3 tests/live_lifecycle.py` | Community lifecycle, convergence, DB/Vault interruption, reset and scoped teardown pass |
+| `python3 tests/fresh_clone.py` | Clean checkout, uncached application layers, no developer env/node_modules, community starter/baseline/solution, unit/core/browser checks and teardown pass |
+| `make test-browser` inside clean solution checkout | 2 real Chromium tests pass |
+| `terraform -chdir=infra fmt -check` and validate with instance TF_DATA_DIR | Pass |
+| Both Ansible playbook syntax checks | Pass |
+| `python3 scripts/check_docs.py` | All current local Markdown links/anchors resolve |
+| Invalid/reserved instance, occupied port, missing tool | Preflight fails correctly without creating an instance directory |
+| Added UPDATE grant then configure/repeat | First run reports changed=1 and removes drift; repeat reports changed=0 |
+| Provider checksums for darwin_arm64/darwin_amd64/linux_arm64/linux_amd64 | Downloaded/verified and committed |
+| Node/PostgreSQL/community Vault/Enterprise Vault manifests | All include ARM64 and AMD64 |
+| `commit_gh` staged secret scans | Pass at each implementation commit |
+
+The final concurrency unit check issues 12 simultaneous requests, verifies one
+shared in-flight Vault retrieval and 12 closed DB clients, then verifies a later
+request performs a new Vault read. Completed authorization is never cached.
+
+The fresh-checkout harness creates a separate clone under ignored `.workshop/`,
+with unique instance names and distinct loopback ports. Its application builds
+use `--no-cache`; public upstream image caches may be reused. It verifies that a
+fresh starter returns 403, baseline remains unlocked=false and fails the core
+verifier, and explicit solution mode passes the real authorization checks. Named
+before/after snapshots check pre-existing container identities. An initial final
+snapshot observed our intentionally concurrent default-backend rebuild; the harness
+now holds the source checkout's operation lock, and the isolated rerun passes.
+
+Private evidence/logs stay under `.workshop/validation/` and the generated clean
+checkout. No logs containing credentials or licenses are committed. The earlier
+101-container snapshot passed, and the final isolated run independently verifies
+its own before/after resource set. Temporary cycle/fresh service resources are
+removed; the final default lab remains available in the learner profile.
+
+### Acceptance coverage
+
+| Requirement | Current evidence |
+| --- | --- |
+| AC-01 | Clean checkout and uncached application installs/builds pass |
+| AC-02 | Unlicensed community run with no HCP credentials/services passes |
+| AC-03 | macOS ARM64 passes; other native host targets explicitly unverified below |
+| AC-04 | Scoped Terraform state, non-secret outputs and service ownership checked |
+| AC-05 | Repeated configure/seed changed=0; credential/data retention tested |
+| AC-06 | Exact ordered identities and all read/write/admin permission cases tested |
+| AC-07 | Baseline, real denial with valid DB credentials, strict lock and recovery tested |
+| AC-08 | Actual AppRole/KV access, app write denial and read-only DB enforcement tested |
+| AC-09 | 500 records, shape, limits, explicit order and 32-letter puzzle tested |
+| AC-10 | Vault restart, missing app file, DB interruption and reconfigure recovery tested |
+| AC-11 | Permissions, state exclusion, app bootstrap separation, log/route checks and staged scans pass |
+| AC-12 | Down/reset/destroy, wrong owner, no confirmation and failed teardown preservation tested |
+| AC-13 | Guide commands exercised; timed participant pilot remains outstanding |
+| AC-14 | Active automation audit finds no HCP execution dependency; historical material is labelled |
+
+### Portability matrix and remaining work
+
+| Environment | Execution status |
+| --- | --- |
+| macOS ARM64 + Podman machine Linux ARM64 | Full tested path; Podman client 6.1.4/server 5.7.1, Terraform 1.14.2, Python tooling 3.13, Node image 22.21.1 |
+| Native Linux ARM64 host | Provider/image availability verified; host orchestration not executed |
+| Native Linux AMD64 host | Provider/image availability verified; full execution not performed |
+| macOS AMD64 host | Provider/image availability verified; full execution not performed |
+| WSL2 | Setup documented; full execution not performed |
+| Native Windows/PowerShell | Outside the supported command interface |
+
+A Linux container running in a Mac Podman VM is not a native Linux host validation.
+No emulated/native AMD64 run is claimed. On each remaining host, a maintainer should
+run the following from a fresh clone and record exact tool versions/results:
+
+```sh
+make doctor
+make up PROFILE=solution VAULT_EDITION=community AUTO_APPROVE=1
+make test
+make verify
+make test-browser
+python3 tests/live_lifecycle.py
+make destroy CONFIRM=default
+```
+
+Browser maintenance checks additionally require host Node/npm. Run lifecycle and
+fresh-checkout acceptance without concurrent lab mutations. The source guard
+coordinates this checkout; unrelated project automation may still change its own
+resources, in which case inspect named snapshots rather than claiming isolation.
+A timed participant pilot and the optional advanced labs are not release evidence.
+
+Final isolated clean-checkout evidence: `.workshop/fresh-547317`, against application
+commit `1baac15`; all phases and named resource preservation passed. Its source
+operation lock prevented overlapping source-checkout mutations during the run.
+The licensed default solution was independently rebuilt and verified on the same
+application source, then restored to the starter. Actual local license, root/admin,
+persona and app credential values were checked absent from tracked content and
+all default service log/config-environment output without printing those values.
+The temporary check instance was destroyed afterward; only default's four project
+containers remain. Its viewer is http://127.0.0.1:15173 with the intentional learner lock.

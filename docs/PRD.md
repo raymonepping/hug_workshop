@@ -1,6 +1,6 @@
 # PRD — Unlock the Data: local workshop
 
-Status: implementation in progress through the numbered prompts.
+Status: local core implemented; see VALIDATION.md for executed checks and remaining native-host/pilot limits.
 Date: 5 November 2026.
 Baseline: the existing HUG workshop reviewed in [PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md).
 

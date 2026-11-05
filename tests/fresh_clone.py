@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build and verify a clean checkout without private developer files or cached app layers."""
 import json
+import fcntl
 import os
 from pathlib import Path
 import secrets
@@ -28,6 +29,10 @@ def health():
 def snapshot():
     lines=subprocess.check_output(['podman','ps','-a','--format','{{.Names}} {{.ID}}'],text=True).splitlines()
     return dict(line.split(' ',1) for line in lines)
+# Hold the source checkout's operation lock; cloned commands have a separate lock.
+SOURCE_LOCK=(ROOT/'.workshop/operation.lock').open('a')
+try:fcntl.flock(SOURCE_LOCK,fcntl.LOCK_EX|fcntl.LOCK_NB)
+except BlockingIOError:raise SystemExit('Another source-checkout mutation is running; retry fresh-clone acceptance afterward')
 before=snapshot()
 (LOGS/('fresh-'+ID+'-before.json')).write_text(json.dumps(before))
 subprocess.run(['git','clone','--no-local',str(ROOT),str(DEST)],check=True)

@@ -61,3 +61,10 @@ need a maintainer with those environments.
 
 Use `commit_gh` for commits/pushes, leave secret scanning enabled, and never stage
 local assistant instructions or private runtime files.
+
+`python3 tests/fresh_clone.py` validates a clean checkout in a unique private
+subdirectory, including uncached app builds and community baseline/starter/solution
+flows. It requires free ports 45432/48200/43004/45173, host Node/npm for Chromium,
+and holds this source checkout's mutation lock. Do not run another infrastructure
+mutation in parallel. Successful runs destroy their service resources and retain
+private evidence. Failure evidence includes named snapshots for diagnosis.

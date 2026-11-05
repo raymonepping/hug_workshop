@@ -11,7 +11,7 @@ Execute the numbered prompts in order. Podman supersedes the original Docker-eng
 | 5 frontend | Implemented; Chromium transition/safety/mobile checks pass |
 | 6 Make/verification | Implemented; scoped lifecycle and fault-recovery run passes |
 | 7 guides/retirement | Implemented; current guides linked and HCP source retired |
-| 8 acceptance/portability | Pending |
+| 8 acceptance/portability | Implemented; clean-checkout acceptance passes, native platform limits recorded |
 
 The configuration, endpoints, private files, and ownership contract is in
 [ARCHITECTURE.md](ARCHITECTURE.md). `workshop/config.json` and `workshop/users.yml`
@@ -26,3 +26,10 @@ are canonical inputs. Runtime data belongs under ignored `.workshop/`.
 | AC-07/09/10 | backend/, frontend/, API tests and recovery verifier |
 | AC-11 | runtime permissions, secret scan, public-file checks |
 | AC-13/14 | participant/facilitator guides and legacy dependency audit |
+
+## Delivered core
+
+All eight prompt stages have been executed. The current workshop runs locally on
+Podman with Terraform, Ansible and Make, ordered synthetic personas, a runnable
+locked learner seam, and an explicit facilitator solution. Validation evidence and
+remaining native-host/pilot work are in [VALIDATION.md](VALIDATION.md).
