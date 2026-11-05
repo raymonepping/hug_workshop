@@ -36,8 +36,8 @@ test('failed probe is not ready and still closes connection', async () => {
   const r = await s.service(); assert.equal(r.health.state, 'db_unavailable'); assert.ok(closed);
   assert.ok(!JSON.stringify(r).includes('secret internal'));
 });
-test('tracked starter reports exercise incomplete without network', async () => {
-  const s = createService({ env: {}, loadRuntime: async () => config });
+test('incomplete exercise is rendered as 403 without network', async () => {
+  const s = createService({ env: {}, loadRuntime: async () => config, credentialReader: async () => { const e = Error('incomplete'); e.code = 'EXERCISE_INCOMPLETE'; throw e; } });
   const r = await s(); assert.equal(r.status, 403); assert.equal(r.health.state, 'exercise_incomplete');
 });
 test('Vault reference revokes temporary token even when KV read is denied', async () => {

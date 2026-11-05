@@ -158,3 +158,5 @@ scripts/attendees.auto.tfvars.json
 /.terraform.lock.hcl
 
 !tests/browser/package-lock.json
+
+!/.env.example

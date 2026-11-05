@@ -1,3 +1,6 @@
+> Historical workshop material. Commands and requirements below are obsolete.
+> Start with [the current setup guide](../SETUP.md) and [exercises](../EXERCISES.md).
+
 # 🚀 HUG Workshop — *Unlock the Data*
 
 > Looking for deep-dive references? See **[ARTICLE_INDEX.md](./ARTICLE_INDEX.md)**.

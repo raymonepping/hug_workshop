@@ -1,3 +1,6 @@
+> Historical workshop material. Commands and requirements below are obsolete.
+> Start with [the current setup guide](../SETUP.md) and [exercises](../EXERCISES.md).
+
 # 🏗️ Construction Guide — Building, Running, and Preparing for Terraform Deployment
 
 This document explains how to:

@@ -45,6 +45,8 @@ def license_value():
 
 def config(environ=None):
     env = os.environ if environ is None else environ
+    invariants={'database':'workshop','app_user':'workshop_app','vault_mount':'kv','vault_secret':'workshop/db'}
+    if any(DEFAULTS.get(k)!=v for k,v in invariants.items()):raise ValueError('Core DB/Vault schema changes require updating the service contracts together')
     instance = env.get('INSTANCE', 'default')
     saved={}
     if environ is None:
@@ -95,7 +97,10 @@ def doctor(c):
     tool_python()
     info=json.loads(output(['podman','info','--format','json']))
     print('Python',platform.python_version(),'Podman',info['version']['Version'],info['host']['arch'])
-    print('Terraform',json.loads(output(['terraform','version','-json']))['terraform_version'])
+    tf_version=json.loads(output(['terraform','version','-json']))['terraform_version']
+    if not ( (1,6) <= tuple(int(x) for x in tf_version.split('.')[:2]) < (2,0) ):raise ValueError('Terraform >=1.6,<2 is required')
+    if 'GNU Make' not in output(['make','--version']):raise ValueError('GNU Make is required')
+    print('Terraform',tf_version)
     sock=engine_socket()
     if not sock.startswith('unix://'):raise ValueError('Use a local/forwarded Podman Unix API socket')
     if not Path(sock.removeprefix('unix://')).is_socket():

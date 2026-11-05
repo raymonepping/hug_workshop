@@ -8,7 +8,6 @@
     "start": "node --watch frontend.js"
   },
   "dependencies": {
-    "dotenv": "17.2.3",
     "express": "5.1.0"
   },
   "license": "GPL-3.0-only"

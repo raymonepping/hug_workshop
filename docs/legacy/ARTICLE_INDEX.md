@@ -1,3 +1,6 @@
+> Historical workshop material. Commands and requirements below are obsolete.
+> Start with [the current setup guide](../SETUP.md) and [exercises](../EXERCISES.md).
+
 # 📚 Workshop Reference Index — “Read What Matters”
 
 This page collects the **official docs** and **field-tested articles** that will help you during (and after) the workshop.  

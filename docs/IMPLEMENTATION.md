@@ -10,7 +10,7 @@ Execute the numbered prompts in order. Podman supersedes the original Docker-eng
 | 4 backend | Implemented; unit and real Vault denial/recovery checks pass |
 | 5 frontend | Implemented; Chromium transition/safety/mobile checks pass |
 | 6 Make/verification | Implemented; scoped lifecycle and fault-recovery run passes |
-| 7 guides/retirement | Pending |
+| 7 guides/retirement | Implemented; current guides linked and HCP source retired |
 | 8 acceptance/portability | Pending |
 
 The configuration, endpoints, private files, and ownership contract is in

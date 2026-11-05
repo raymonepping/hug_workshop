@@ -80,3 +80,16 @@ private under .workshop/validation. A port-preflight TIME_WAIT false positive wa
 fixed and the full lifecycle rerun passed. Overlapping mutation processes fail
 clearly; status/doctor remain read-only and available. Destruction without matching
 CONFIRM and wrong-owner state are rejected; failed teardown retains runtime data.
+
+## Stage 7
+
+New setup, participant, facilitator, troubleshooting and extension guides describe
+the implemented Podman/Make flow. Sixty-eight local Markdown links/anchors resolve.
+The old guides/connectors are explicitly historical under docs/legacy; HCP root
+Terraform, onboarding/agent/drift scripts, Compose, old env examples and encrypted
+seed workflow are retired. The canonical plaintext puzzle and portable generator
+remain. Local .env/license and other ignored user files were preserved.
+Application lockfiles were refreshed and both clean npm installs passed after
+removing unused dotenv. The incomplete-error unit fixture now injects that error
+so completing a learner file will not make unrelated unit tests fail. A real
+fresh-clone starter checkpoint is checked separately in stage 8.

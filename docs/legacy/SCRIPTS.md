@@ -1,3 +1,6 @@
+> Historical workshop material. Commands and requirements below are obsolete.
+> Start with [the current setup guide](../SETUP.md) and [exercises](../EXERCISES.md).
+
 # 📘 SCRIPTS.md
 
 Utility scripts included in this workshop

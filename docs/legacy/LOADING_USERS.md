@@ -1,3 +1,6 @@
+> Historical workshop material. Commands and requirements below are obsolete.
+> Start with [the current setup guide](../SETUP.md) and [exercises](../EXERCISES.md).
+
 # 📦 Loading Users into Terraform Cloud: JSON to tfvars the Smart Way
 
 Terraform Cloud user onboarding doesn't have to involve guesswork, duplication, or brittle hardcoding. In this short guide, we’ll walk through how to use a clean JSON input, a smart Bash script, and Terraform outputs to create a locked, reproducible `locked_users.auto.tfvars` file for consistent user management.

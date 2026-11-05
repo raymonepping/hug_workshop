@@ -50,3 +50,12 @@ mounts, ACLs, personas and AppRole artifacts using the retained DB credentials.
 `down` reconciles a Terraform setting that removes containers/network but preserves
 the DB volume. `destroy` deletes the selected instance's Terraform resources;
 `reset` removes its runtime directory only after successful destruction.
+
+## Fixed core schema
+
+Database `workshop`, application role `workshop_app`, and KV mount/path
+`kv/data/workshop/db` are fixed core schema invariants, documented in config.json.
+They are not operator overrides: changing them requires updating the DB/Vault roles
+and backend contract together. Instance names, prefixes, ports, profile, edition
+and image choices provide the reusable environment controls. A temporary prefixed
+Podman test container is a test process, not a competing persistent service owner.

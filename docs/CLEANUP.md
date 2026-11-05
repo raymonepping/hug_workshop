@@ -1,5 +1,8 @@
 # Cleanup before the local workshop revision
 
+> Historical baseline record. The local revision is described in [setup](SETUP.md)
+> and [implementation status](IMPLEMENTATION.md); old source paths below may be retired.
+
 Date: 5 November 2026.
 
 This cleanup preserves the existing application and provisioning source while

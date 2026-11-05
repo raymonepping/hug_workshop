@@ -1,5 +1,8 @@
 # Workshop analysis
 
+> Historical baseline record. The local revision is described in [setup](SETUP.md)
+> and [implementation status](IMPLEMENTATION.md); old source paths below may be retired.
+
 Reviewed on 5 November 2026 against commit `31b3b24` on `main`.
 
 ## Scope and limits
