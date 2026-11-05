@@ -10,6 +10,7 @@ import platform
 import re
 import shutil
 import secrets
+import shlex
 import socket
 import subprocess
 import sys
@@ -27,6 +28,19 @@ def output(args):
     return run(args, capture_output=True, text=True).stdout.strip()
 
 
+def license_value():
+    value=os.environ.get('VAULT_LICENSE','')
+    if value:return value
+    envfile=ROOT/'.env'
+    if envfile.exists():
+        match=re.search(r'^\s*(?:export\s+)?VAULT_LICENSE\s*=\s*(.*)$',envfile.read_text(),re.M)
+        if match:
+            try:parts=shlex.split(match.group(1),comments=True)
+            except ValueError:raise ValueError('Invalid VAULT_LICENSE quoting in local .env') from None
+            return parts[0] if len(parts)==1 else ''
+    return ''
+
+
 def config(environ=None):
     env = os.environ if environ is None else environ
     instance = env.get('INSTANCE', 'default')
@@ -35,6 +49,11 @@ def config(environ=None):
         raise ValueError('INSTANCE must be a lowercase name (maximum 25 characters)')
     if not re.fullmatch(r'hug-[a-z0-9-]{3,30}-', prefix):
         raise ValueError('PREFIX must be a unique hug-...- prefix')
+    edition = env.get('VAULT_EDITION', 'auto')
+    if edition not in ['auto','enterprise','community']:raise ValueError('VAULT_EDITION=auto|enterprise|community')
+    licensed = bool(license_value()) if environ is None else bool(env.get('VAULT_LICENSE'))
+    if edition == 'enterprise' and not licensed:raise ValueError('Enterprise requires a local VAULT_LICENSE')
+    enterprise = edition == 'enterprise' or (edition == 'auto' and licensed)
     ports = {k: int(env.get(k.upper() + '_PORT', v)) for k,v in DEFAULTS['ports'].items()}
     if len(set(ports.values())) != 4 or any(not 1024 <= v <= 65535 for v in ports.values()):
         raise ValueError('Ports must be distinct integers between 1024 and 65535')
@@ -43,7 +62,7 @@ def config(environ=None):
     if profile not in ['starter','solution'] or mode not in ['required','baseline']:
         raise ValueError('PROFILE=starter|solution and MODE=required|baseline')
     return {**DEFAULTS, 'instance':instance, 'prefix':prefix, 'name':prefix+instance,
-            'runtime':str(ROOT/'.workshop'/instance), 'ports':ports, 'profile':profile, 'mode':mode}
+            'runtime':str(ROOT/'.workshop'/instance), 'ports':ports, 'profile':profile, 'mode':mode, 'enterprise':enterprise}
 
 
 def engine_socket():
@@ -65,6 +84,7 @@ def doctor(c):
             raise ValueError('Install prerequisite: ' + tool)
     if sys.version_info < (3,12):
         raise ValueError('Python 3.12 or newer is required')
+    tool_python()
     info=json.loads(output(['podman','info','--format','json']))
     print('Python',platform.python_version(),'Podman',info['version']['Version'],info['host']['arch'])
     print('Terraform',json.loads(output(['terraform','version','-json']))['terraform_version'])
@@ -96,6 +116,8 @@ def initialize(c):
     f=d/'bootstrap/secrets.json'
     if not f.exists():
         private_json(f,{'app_password':secrets.token_hex(24),'users':{u['name']:secrets.token_hex(16) for u in json.loads((ROOT/'workshop/users.yml').read_text())['users']}})
+    if c['enterprise']:
+        f=d/'vault/vault.hclic';f.write_text(license_value());f.chmod(0o600)
     if not (d/'app/config.json').exists():private_json(d/'app/config.json',{})
     if not (d/'images.json').exists():private_json(d/'images.json',{'backend':'localhost/'+c['name']+'-backend:pending','frontend':'localhost/'+c['name']+'-frontend:pending'})
     tf(c,['init','-input=false','-reconfigure','-backend-config=path='+str(d/'terraform.tfstate')],variables=False)
@@ -107,9 +129,10 @@ def tf(c,args,variables=True):
     command=['terraform','-chdir='+str(ROOT/'infra'),*args]
     if variables:
         images={k:v for k,v in c['images'].items() if k != 'node'}
+        if c['enterprise']:images['vault']=c['enterprise_image']
         images.update(json.loads((d/'images.json').read_text()))
         values={'name':c['name'],'runtime':str(d),'podman_socket':engine_socket(),'ports':c['ports'],
-                'images':images,'profile':c['profile'],'mode':c['mode'],'running':c.get('running',True)}
+                'images':images,'profile':c['profile'],'mode':c['mode'],'running':c.get('running',True),'enterprise':c['enterprise']}
         private_json(d/'inputs.json',values)
         command+=['-var-file='+str(d/'inputs.json')]
     return run(command,env=env)
@@ -142,6 +165,32 @@ def output_with_env(args,env):
     return run(args,env=env,capture_output=True,text=True).stdout
 
 
+def tool_python():
+    for executable in [os.environ.get('TOOLS_PYTHON'),shutil.which('python3.13'),shutil.which('python3.14'),shutil.which('python3.12'),sys.executable]:
+        if executable:
+            version=json.loads(output([executable,'-c','import sys,json; print(json.dumps(list(sys.version_info[:2])))']))
+            if [3,12] <= version < [3,15]:return executable
+    raise ValueError('Install Python 3.12–3.14 for pinned Ansible; set TOOLS_PYTHON if needed')
+
+
+def ansible(c,playbook):
+    tools=ROOT/'.workshop/tools'
+    python=tools/'bin/python'
+    requirement=ROOT/'ansible/requirements.txt'
+    marker=tools/'requirements.sha256'
+    digest=hashlib.sha256(requirement.read_bytes()).hexdigest()
+    if not python.exists():
+        run([tool_python(),'-m','venv',str(tools)])
+    if not marker.exists() or marker.read_text()!=digest:
+        run([str(python),'-m','pip','install','--disable-pip-version-check','-r',str(requirement)])
+        marker.write_text(digest)
+    env=os.environ.copy();env['ANSIBLE_HOME']=str(ROOT/'.workshop/ansible-home')
+    env['ANSIBLE_LOCAL_TEMP']=str(ROOT/'.workshop/tmp');env['ANSIBLE_NOCOLOR']='1'
+    args=[str(tools/'bin/ansible-playbook'),'-i',str(ROOT/'ansible/inventory.yml'),str(ROOT/'ansible'/playbook),
+          '-e',json.dumps({'runtime':c['runtime'],'ansible_python_interpreter':str(python)})]
+    run(args,env=env)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command',choices=COMMANDS,nargs='?',default='help')
@@ -156,6 +205,8 @@ def main():
     elif args.command=='build':initialize(c);build(c)
     elif args.command=='plan':initialize(c);tf(c,['plan'])
     elif args.command=='infra':initialize(c);provision(c)
+    elif args.command=='configure':ansible(c,'configure.yml')
+    elif args.command=='seed':ansible(c,'seed.yml')
     elif args.command=='down':
         c['running']=False;tf(c,['apply']+(['-auto-approve'] if os.environ.get('AUTO_APPROVE')=='1' else []))
     elif args.command=='destroy':

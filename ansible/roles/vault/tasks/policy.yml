@@ -1,0 +1,23 @@
+- name: Define desired scoped policy
+  ansible.builtin.set_fact:
+    desired_policy: "path \"kv/data/workshop/db\" { capabilities = {{ (persona.capabilities if persona.capabilities else ['deny']) | to_json }} }"
+
+- name: Read scoped policy
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/policies/acl/workshop-{{ persona.name }}"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    status_code: [200, 404]
+  register: current_policy
+  no_log: true
+
+- name: Reconcile scoped policy when changed
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/policies/acl/workshop-{{ persona.name }}"
+    method: PUT
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {policy: "{{ desired_policy }}"}
+    status_code: 204
+  when: current_policy.status == 404 or current_policy.json.data.policy != desired_policy
+  changed_when: true
+  no_log: true

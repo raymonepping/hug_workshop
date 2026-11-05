@@ -6,7 +6,7 @@ Execute the numbered prompts in order. Podman supersedes the original Docker-eng
 | --- | --- |
 | 1 foundation | Implemented; validation in VALIDATION.md |
 | 2 infrastructure | Implemented and tested on Podman ARM64 |
-| 3 Ansible | Pending |
+| 3 Ansible | Implemented; converges on community and licensed Enterprise Vault |
 | 4 backend | Pending |
 | 5 frontend | Pending |
 | 6 Make/verification | Pending |

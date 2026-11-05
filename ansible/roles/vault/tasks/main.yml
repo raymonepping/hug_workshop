@@ -1,0 +1,138 @@
+- name: Wait for disposable Vault
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/health"
+    timeout: 3
+  register: vault_ready
+  until: vault_ready.status == 200
+  retries: 30
+  delay: 1
+
+- name: Read enabled mounts
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/mounts"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+  register: mounts
+  no_log: true
+
+- name: Enable canonical KV v2 mount
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/mounts/kv"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {type: kv, options: {version: '2'}}
+    status_code: 204
+  when: "'kv/' not in mounts.json.data"
+  changed_when: true
+  no_log: true
+
+- name: Read enabled authentication methods
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/auth"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+  register: auth_methods
+  no_log: true
+
+- name: Enable human and application authentication
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/auth/{{ item }}"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {type: "{{ item }}"}
+    status_code: 204
+  when: "item + '/' not in auth_methods.json.data"
+  loop: [userpass, approle]
+  changed_when: true
+  no_log: true
+
+- name: Converge persona policies
+  ansible.builtin.include_tasks: policy.yml
+  loop: "{{ users + [{'name': 'app', 'capabilities': ['read']}] }}"
+  loop_control: {loop_var: persona, label: "{{ persona.name }}"}
+
+- name: Converge human identities
+  ansible.builtin.include_tasks: user.yml
+  loop: "{{ users }}"
+  loop_control: {loop_var: persona, label: "{{ persona.name }}"}
+
+- name: Read application database secret
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/kv/data/workshop/db"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    status_code: [200, 404]
+  register: kv
+  no_log: true
+
+- name: Store application database credentials only when changed
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/kv/data/workshop/db"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {data: {username: workshop_app, password: "{{ credentials.app_password }}"}}
+  when: kv.status == 404 or kv.json.data.data != {'username':'workshop_app', 'password':credentials.app_password}
+  changed_when: true
+  no_log: true
+
+- name: Read application AppRole
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/workshop-app"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    status_code: [200, 404]
+  register: app_role
+  no_log: true
+
+- name: Configure least-privilege application AppRole
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/workshop-app"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {token_policies: [workshop-app], token_ttl: 60, token_max_ttl: 300, secret_id_ttl: 0, secret_id_num_uses: 0}
+    status_code: 204
+  when: app_role.status == 404 or app_role.json.data.token_policies != ['workshop-app'] or app_role.json.data.token_ttl != 60 or app_role.json.data.token_max_ttl != 300
+  changed_when: true
+  no_log: true
+
+- name: Read role identifier
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/workshop-app/role-id"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+  register: role_id
+  no_log: true
+
+- name: Load existing application runtime configuration
+  ansible.builtin.set_fact:
+    existing_app: "{{ lookup('ansible.builtin.file', runtime + '/app/config.json') | from_json }}"
+  no_log: true
+
+- name: Check existing SecretID validity
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/workshop-app/secret-id/lookup"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {secret_id: "{{ existing_app.secret_id | default('missing') }}"}
+    status_code: [200, 204, 400, 403, 404, 500]
+  register: secret_lookup
+  no_log: true
+
+- name: Issue application SecretID when absent or invalid
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/workshop-app/secret-id"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {}
+  when: secret_lookup.status != 200
+  register: new_secret
+  changed_when: true
+  no_log: true
+
+- name: Render application-only configuration
+  ansible.builtin.copy:
+    dest: "{{ runtime }}/app/config.json"
+    mode: '0600'
+    content: "{{ {'role_id': role_id.json.data.role_id, 'secret_id': (new_secret.json.data.secret_id if secret_lookup.status != 200 else existing_app.secret_id), 'username': 'workshop_app', 'password': credentials.app_password} | to_nice_json }}\n"
+  no_log: true

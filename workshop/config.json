@@ -15,5 +15,6 @@
     "postgres": "docker.io/library/postgres:17.7-alpine",
     "vault": "docker.io/hashicorp/vault:1.21.1",
     "node": "docker.io/library/node:22.21.1-alpine"
-  }
+  },
+  "enterprise_image": "docker.io/hashicorp/vault-enterprise:2.2.1-ent"
 }

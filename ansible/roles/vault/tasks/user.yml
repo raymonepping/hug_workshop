@@ -1,0 +1,39 @@
+- name: Read human identity configuration
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/userpass/users/{{ persona.name }}"
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    status_code: [200, 404]
+  register: current_user
+  no_log: true
+
+- name: Check retained password without exposing it
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/userpass/login/{{ persona.name }}"
+    method: POST
+    body_format: json
+    body: {password: "{{ credentials.users[persona.name] }}"}
+    status_code: [200, 400, 403]
+  register: human_login
+  when: current_user.status == 200
+  no_log: true
+
+- name: Revoke temporary probe token
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/token/revoke-self"
+    method: POST
+    headers: {X-Vault-Token: "{{ human_login.json.auth.client_token }}"}
+    status_code: 204
+  when: current_user.status == 200 and human_login.status == 200
+  no_log: true
+
+- name: Reconcile identity and scoped policy
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/userpass/users/{{ persona.name }}"
+    method: POST
+    headers: {X-Vault-Token: "{{ root_token }}"}
+    body_format: json
+    body: {password: "{{ credentials.users[persona.name] }}", token_policies: ["workshop-{{ persona.name }}"], token_ttl: 300}
+    status_code: 204
+  when: current_user.status == 404 or human_login.status != 200 or current_user.json.data.token_policies != ['workshop-' + persona.name]
+  changed_when: true
+  no_log: true

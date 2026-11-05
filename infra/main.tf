@@ -50,7 +50,7 @@ resource "docker_container" "service" {
     external = var.ports[each.key]
     ip       = "127.0.0.1"
   }
-  env        = each.key == "postgres" ? ["POSTGRES_DB=workshop", "POSTGRES_PASSWORD_FILE=/bootstrap/admin-password"] : each.key == "vault" ? ["VAULT_DISABLE_MLOCK=true"] : each.key == "backend" ? ["PORT=3004", "DB_TYPE=postgres", "DB_HOST=postgres", "DB_NAME=workshop", "VAULT_ADDR=http://vault:8200", "RUNTIME_DIR=/runtime", "WORKSHOP_PROFILE=${var.profile}", "DB_AUTH_MODE=${var.mode}"] : ["PORT=5173", "FRONTEND_API_BASE=http://127.0.0.1:${var.ports["backend"]}"]
+  env        = each.key == "postgres" ? ["POSTGRES_DB=workshop", "POSTGRES_PASSWORD_FILE=/bootstrap/admin-password"] : each.key == "vault" ? concat(["VAULT_DISABLE_MLOCK=true"], var.enterprise ? ["VAULT_LICENSE_PATH=/bootstrap/vault.hclic"] : []) : each.key == "backend" ? ["PORT=3004", "DB_TYPE=postgres", "DB_HOST=postgres", "DB_NAME=workshop", "VAULT_ADDR=http://vault:8200", "RUNTIME_DIR=/runtime", "WORKSHOP_PROFILE=${var.profile}", "DB_AUTH_MODE=${var.mode}"] : ["PORT=5173", "FRONTEND_API_BASE=http://127.0.0.1:${var.ports["backend"]}"]
   entrypoint = each.key == "vault" ? ["/bin/sh", "-ec", "export VAULT_DEV_ROOT_TOKEN_ID=$(cat /bootstrap/root-token); exec /usr/local/bin/docker-entrypoint.sh server -dev -dev-listen-address=0.0.0.0:8200 1>/dev/null"] : null
   dynamic "volumes" {
     for_each = each.key == "postgres" ? [1] : []

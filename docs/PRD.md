@@ -1,6 +1,6 @@
 # PRD — Unlock the Data: local workshop
 
-Status: implementation specification; the new variant is not implemented yet.
+Status: implementation in progress through the numbered prompts.
 Date: 5 November 2026.
 Baseline: the existing HUG workshop reviewed in [PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md).
 
@@ -264,3 +264,12 @@ actual versions rather than copying an unverified latest-version assumption.
 
 The duration, PostgreSQL-only core, persona permissions, AppRole application auth,
 and disposable Vault default are specification choices to validate during delivery.
+
+## Enterprise option
+
+User steering adds Podman as the required engine and optional local Vault Enterprise
+2.x support. Auto mode selects the pinned Enterprise image when `VAULT_LICENSE` is
+available in the local root `.env` or process environment. The value is copied only
+to a private runtime file and consumed through `VAULT_LICENSE_PATH`. It never becomes
+a Terraform variable or application setting. `VAULT_EDITION=community` runs the
+unlicensed core; a facilitator license is not a participant prerequisite.

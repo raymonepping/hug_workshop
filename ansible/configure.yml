@@ -1,0 +1,13 @@
+- name: Configure the local workshop services
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../workshop/users.yml
+  vars:
+    lab: "{{ lookup('ansible.builtin.file', runtime + '/metadata.json') | from_json }}"
+    credentials: "{{ lookup('ansible.builtin.file', runtime + '/bootstrap/secrets.json') | from_json }}"
+    root_token: "{{ lookup('ansible.builtin.file', runtime + '/vault/root-token') }}"
+    vault_url: "{{ lab.urls.vault }}"
+  roles:
+    - role: database
+    - role: vault

@@ -9,3 +9,8 @@ variable "running" {
   type    = bool
   default = true
 }
+
+variable "enterprise" {
+  type    = bool
+  default = false
+}

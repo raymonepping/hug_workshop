@@ -23,3 +23,20 @@ the DB volume. A repeated plan reports no changes after handling Podman's inject
 IPAM/RLIMIT defaults narrowly. Generated credential values are absent from local
 Terraform state. PostgreSQL and Vault manifests include both ARM64 and AMD64.
 Other native platform runs remain pending; raw state and logs stay ignored.
+
+## Stage 3
+
+Pinned isolated Ansible 2.21.3 on Python 3.13 configures DB roles/schema, KV v2,
+userpass personas, scoped ACLs, AppRole, and private runtime files. Both playbooks
+pass syntax checks. Configure/seed repeat with `changed=0`, `failed=0`. Real checks
+pass for all three personas' authentication, read/write/admin denials, AppRole
+read-only scope, 500 rows and denied DB inserts/table creation.
+
+Per user steering, Podman remains the engine and a local nonempty VAULT_LICENSE
+auto-selects Enterprise 2.2.1 (same version family as the read-only vault_crypto
+reference). The value is read without executing .env, stored only in a 0600 file,
+and mounted using VAULT_LICENSE_PATH. Community 1.21.1 and Enterprise 2.2.1 were
+both exercised. Enterprise manifest includes ARM64/AMD64. Its configuration also
+converges after recreation. Credentials and license were checked absent from local
+Terraform state and Vault stdout/stderr logs. Python 3.15 cannot run this Ansible
+version; tooling now explicitly selects supported Python 3.12–3.14 instead.

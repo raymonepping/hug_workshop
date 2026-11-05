@@ -1,0 +1,20 @@
+- name: Wait for PostgreSQL
+  ansible.builtin.command:
+    argv: [podman, exec, "{{ lab.name }}-postgres", pg_isready, -U, postgres, -d, workshop]
+  register: db_ready
+  until: db_ready.rc == 0
+  retries: 30
+  delay: 1
+  changed_when: false
+
+- name: Configure database roles and schema
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_python_interpreter }}"
+      - "{{ playbook_dir }}/../scripts/database.py"
+      - configure
+      - "{{ runtime }}"
+      - "{{ lab.name }}"
+  register: database_configuration
+  changed_when: (database_configuration.stdout | from_json).changed
+  no_log: true
