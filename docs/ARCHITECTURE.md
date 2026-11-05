@@ -34,7 +34,8 @@ readiness is a real query, not container/process liveness.
 Public errors contain only stable state codes. Limits default to 32, cap at 100,
 and invalid/nonpositive values return HTTP 400. Rows are `{id, idx, title}`, ordered
 by `idx, id`. The health endpoint never returns secrets. Authorization is rechecked
-on every strict-mode request (bounded network timeouts); no stale DB handle grants
+on strict-mode requests (bounded network timeouts); overlapping reads share only
+an in-flight operation, never a completed credential result. No stale DB handle grants
 access. Requests use their own short-lived DB connection and close it reliably.
 
 ## Secrets and lifecycle

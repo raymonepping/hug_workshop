@@ -26,9 +26,11 @@ test('baseline is connected but never Vault unlocked', async () => {
   const s = setup({ env: { DB_AUTH_MODE: 'baseline' }, credentialReader: () => { throw Error('must not call'); } });
   const r = await s.service(32); assert.equal(r.status, 200); assert.equal(r.health.channel, 'env'); assert.equal(r.health.unlocked, false);
 });
-test('concurrent requests close all independent connections', async () => {
-  const s = setup(); const results = await Promise.all(Array.from({ length: 12 }, () => s.service(32)));
-  assert.ok(results.every(r => r.health.unlocked)); assert.deepEqual(s.counts(), [12, 12]);
+test('concurrent requests coalesce Vault reads and close all independent DB connections', async () => {
+  let reads = 0;
+  const s = setup({ credentialReader: async () => { reads++; await new Promise(resolve => setTimeout(resolve, 5)); return config; } }); const results = await Promise.all(Array.from({ length: 12 }, () => s.service(32)));
+  assert.ok(results.every(r => r.health.unlocked)); assert.deepEqual(s.counts(), [12, 12]); assert.equal(reads, 1);
+  await s.service(); assert.equal(reads, 2); // A completed read never authorizes a later request.
 });
 test('failed probe is not ready and still closes connection', async () => {
   let closed = false;

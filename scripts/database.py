@@ -31,11 +31,14 @@ def main():
         sql(name,"CREATE TABLE IF NOT EXISTS workshop_configuration (key text PRIMARY KEY, value text NOT NULL);")
         saved=sql(name,"SELECT value FROM workshop_configuration WHERE key='app_password_fingerprint';")
         grants=sql(name,"SELECT count(*) FROM information_schema.role_table_grants WHERE grantee='workshop_app' AND table_name='messages' AND privilege_type='SELECT';")
-        changed=before!='1' or saved!=fingerprint or grants!='1'
+        all_grants=sql(name,"SELECT count(*) FROM information_schema.role_table_grants WHERE grantee='workshop_app';")
+        safe_role=sql(name,"SELECT count(*) FROM pg_roles WHERE rolname='workshop_app' AND rolcanlogin AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication AND NOT rolbypassrls;")
+        unsafe_create=sql(name,"SELECT has_schema_privilege('workshop_app','public','CREATE') OR has_database_privilege('workshop_app','workshop','CREATE') OR has_database_privilege('workshop_app','workshop','TEMPORARY');") if before=='1' else 'f'
+        changed=before!='1' or saved!=fingerprint or grants!='1' or all_grants!='1' or safe_role!='1' or unsafe_create!='f'
         statement="BEGIN; REVOKE CREATE ON SCHEMA public FROM PUBLIC; REVOKE ALL ON DATABASE workshop FROM PUBLIC; CREATE TABLE IF NOT EXISTS messages(id integer PRIMARY KEY, idx integer UNIQUE NOT NULL, title text NOT NULL); "
         if before!='1':statement+="CREATE ROLE workshop_app LOGIN; "
         if saved!=fingerprint or before!='1':statement+=f"ALTER ROLE workshop_app PASSWORD '{password}'; "
-        statement+="ALTER ROLE workshop_app NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION; REVOKE ALL ON ALL TABLES IN SCHEMA public FROM workshop_app; GRANT CONNECT ON DATABASE workshop TO workshop_app; GRANT USAGE ON SCHEMA public TO workshop_app; GRANT SELECT ON messages TO workshop_app; "
+        statement+="ALTER ROLE workshop_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; REVOKE ALL ON DATABASE workshop FROM workshop_app; REVOKE ALL ON SCHEMA public FROM workshop_app; REVOKE ALL ON ALL TABLES IN SCHEMA public FROM workshop_app; GRANT CONNECT ON DATABASE workshop TO workshop_app; GRANT USAGE ON SCHEMA public TO workshop_app; GRANT SELECT ON messages TO workshop_app; "
         statement+=f"INSERT INTO workshop_configuration VALUES ('app_password_fingerprint','{fingerprint}') ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value; COMMIT;"
         sql(name,statement)
     elif action=='seed':

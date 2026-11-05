@@ -10,7 +10,19 @@ export function createService({ env = process.env, loadRuntime, credentialReader
   const profile = env.WORKSHOP_PROFILE || 'starter';
   const readRuntime = loadRuntime || (async () => JSON.parse(await readFile(path.join(env.RUNTIME_DIR || '/runtime', 'config.json'), 'utf8')));
   const reader = credentialReader || (profile === 'solution' ? solutionReader : starterReader);
-  // No shared initialization or authorization cache: each bounded request owns and closes its client.
+  // Share only an in-flight read, never completed credentials or authorization.
+  let pending = null;
+  async function credentialsFromVault(runtime) {
+    const key = JSON.stringify([runtime.role_id, runtime.secret_id]);
+    if (pending?.key === key) return pending.promise;
+    const entry = { key };
+    entry.promise = Promise.resolve().then(() => reader({ addr: env.VAULT_ADDR || 'http://vault:8200',
+      roleId: runtime.role_id, secretId: runtime.secret_id, path: 'kv/data/workshop/db' }))
+      .finally(() => { if (pending === entry) pending = null; });
+    pending = entry;
+    return entry.promise;
+  }
+  // Each request owns and closes its DB client; no shared connection initialization race.
   return async function execute(limit = null) {
     let db;
     try {
@@ -22,8 +34,7 @@ export function createService({ env = process.env, loadRuntime, credentialReader
       if (mode === 'baseline') {
         credentials = { username: runtime.username, password: runtime.password };
       } else {
-        credentials = await reader({ addr: env.VAULT_ADDR || 'http://vault:8200', roleId: runtime.role_id,
-          secretId: runtime.secret_id, path: 'kv/data/workshop/db' });
+        credentials = await credentialsFromVault(runtime);
       }
       if (!credentials?.username || !credentials?.password) throw new LabError('configuration_error');
       try {
