@@ -38,6 +38,10 @@ credentials.
 - Existing documents in `docs/`, including the historical project analysis.
 - Local assistant tooling, excluded from commits.
 
+During commit, `commit_gh` also removed `assignment_mode.auto.tfvars` and
+`locked_users.auto.tfvars` from tracking because the user's global ignore rules
+exclude `*.tfvars`. Both files remain on disk; their contents were not changed.
+
 The PRD defines the intended replacement; the older source is not presented as
 an already-working local Terraform/Ansible implementation. Generated credential
 and report locations plus `.workshop/` and saved plans are now ignored.
