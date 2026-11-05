@@ -84,7 +84,7 @@ outputs or pretend that `sensitive = true` removes them from state.
 
 ```text
 Makefile
-infra/                  # local Docker Terraform root and committed provider lock
+infra/                  # local Podman Terraform root and committed provider lock
 ansible/                # pinned requirements, localhost inventory, roles, playbooks
 workshop/users.yml      # canonical ordered synthetic identity definition
 workshop/dataset.jsonl  # canonical synthetic puzzle dataset
@@ -188,7 +188,7 @@ Use `INSTANCE=default` and documented port overrides consistently across targets
 | `make reset` | Confirm destruction, destroy, remove this instance's runtime credentials/state only after success, and rebuild |
 
 Implement `down` through the Terraform configuration/lifecycle, not unmanaged
-Docker deletion that silently leaves Terraform state inconsistent. Dry runs/help
+Podman deletion that silently leaves Terraform state inconsistent. Dry runs/help
 must not require credentials. Avoid embedding large shell programs in Make recipes.
 `make -j` must not race destructive or ordering-sensitive targets.
 

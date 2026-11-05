@@ -30,7 +30,7 @@ Requirements:
 - `down` preserves data, `destroy` removes only selected instance resources, and
   `reset` deletes local state/credentials only after successful scoped destruction.
   Use explicit confirmation for destructive targets and an explicit CI override.
-- Never run global Docker prune/stop/delete, auto-push images, or delete state as a
+- Never run global Podman prune/stop/delete, auto-push images, or delete state as a
   shortcut around reconciliation errors. Preserve failed teardown state for retry.
 
 Test dry-run/help and failures with meaningful checks. Then run the full command

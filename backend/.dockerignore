@@ -19,8 +19,6 @@ yarn-error.log
 
 # Coverage and test artifacts
 coverage
-*.test.*
-*.spec.*
 
 # OS / Editor files
 .DS_Store

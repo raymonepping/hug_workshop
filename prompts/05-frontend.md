@@ -21,7 +21,7 @@ Requirements:
 - Establish a dedicated public assets directory and one runtime config source.
   Do not expose package manifests, server source, private runtime files, or state.
 - Keep editable API URLs if useful, with validation and clear reset behavior.
-  Distinguish browser-host URLs from internal Docker addresses.
+  Distinguish browser-host URLs from internal Podman addresses.
 - Use safe DOM rendering for every field, accessible labels/status feedback,
   keyboard navigation, narrow layouts, and reduced-motion support. Refresh shortcuts
   must not intercept ordinary typing inside inputs.

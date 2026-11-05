@@ -102,6 +102,14 @@
   register: role_id
   no_log: true
 
+- name: Recover missing application configuration after an interrupted run
+  ansible.builtin.copy:
+    dest: "{{ runtime }}/app/config.json"
+    content: "{}\n"
+    force: false
+    mode: '0600'
+  no_log: true
+
 - name: Load existing application runtime configuration
   ansible.builtin.set_fact:
     existing_app: "{{ lookup('ansible.builtin.file', runtime + '/app/config.json') | from_json }}"

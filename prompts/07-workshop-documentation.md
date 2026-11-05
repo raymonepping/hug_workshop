@@ -9,7 +9,7 @@ and extension guidance. Update the PRD's status/implementation references honest
 
 Requirements:
 
-- Cover macOS/Linux/WSL2 prerequisites, tested version ranges, architectures, Docker
+- Cover macOS/Linux/WSL2 prerequisites, tested version ranges, architectures, Podman
   context/ports, initial download expectations, and root-directory commands.
 - Explain tool ownership and actual browser/backend/Vault/DB communication.
   Vault issues credentials; it is not a database query proxy.

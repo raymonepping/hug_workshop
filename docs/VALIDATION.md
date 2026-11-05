@@ -61,3 +61,22 @@ labelled, even a vault-kv channel cannot override unlocked=false, denied/unavail
 transitions clear old rows/reveal, and id/idx/title hostile HTML renders as text.
 A mobile screenshot was inspected and remains in ignored .workshop/. The viewer
 serves only public assets and a non-secret runtime endpoint.
+
+## Stage 6
+
+`make test INSTANCE=check`: eight Python contract/lifecycle safety tests plus seven
+backend tests inside a scoped ephemeral Podman test container pass. `make verify`
+asserts real persona/AppRole policies, read-only DB privileges, API shape/order/limits,
+policy denial with valid baseline credentials, recovery, frontend private-path denial,
+private permissions and credential exclusion from state. It intentionally performs
+one same-value brenda write and a temporary app-policy denial/restoration.
+
+`python3 tests/live_lifecycle.py` passed against disposable community-Vault instance
+cycle on ports 35432/38200/33004/35173: up/verify; configure/seed with changed=0;
+down/up retaining data and credentials; Vault restart and missing app-file recovery;
+DB interruption and recovery; reset with new credentials; verify/destroy. All prior
+container IDs survived, including the separate licensed check instance. Logs are
+private under .workshop/validation. A port-preflight TIME_WAIT false positive was
+fixed and the full lifecycle rerun passed. Overlapping mutation processes fail
+clearly; status/doctor remain read-only and available. Destruction without matching
+CONFIRM and wrong-owner state are rejected; failed teardown retains runtime data.

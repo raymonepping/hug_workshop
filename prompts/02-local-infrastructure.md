@@ -35,7 +35,7 @@ Do not configure Vault policies/users or the DB schema through Terraform. Do not
 use `local-exec` as a replacement for an Ansible configuration stage or create
 resources outside Terraform through Compose.
 
-Run formatting, initialization, validation, and a reviewed local plan. When Docker
+Run formatting, initialization, validation, and a reviewed local plan. When Podman
 is available, build/apply only this lab, verify readiness/metadata, and verify a
 second unchanged plan. Test `down`/recreate and destroy on an isolated instance,
 including failure behavior. Never destroy an unrelated pre-existing lab to test.

@@ -65,9 +65,51 @@ def database(runtime):
     print('PASS: dataset count and application DB privilege denials')
 
 
+def api(runtime):
+    d=Path(runtime);meta=json.loads((d/'metadata.json').read_text());base=meta['urls']['backend']
+    code,health=request(base,'/health')
+    require(code==200 and health.get('unlocked') is True and health.get('mode')=='required','Core verification requires completed Vault exercise in required mode')
+    code,body=request(base,'/api/items?limit=32');rows=body.get('items',[])
+    require(code==200 and len(rows)==32,'Authorized API returns requested limit')
+    require(all(set(r)=={'id','idx','title'} and type(r['id']) is int and type(r['idx']) is int and isinstance(r['title'],str) for r in rows),'Normalized item shape')
+    require(rows==sorted(rows,key=lambda r:(r['idx'],r['id'])),'Explicit puzzle ordering')
+    require(''.join(r['title'][0] for r in rows)=='WEARETHEGUARDIANSOFOUROWNSYSTEMS','Puzzle initials')
+    require(len(request(base,'/api/items?limit=999')[1].get('items',[]))==100,'Maximum limit cap')
+    for limit in ['0','-1','abc','1.5']:
+        require(request(base,'/api/items?limit='+limit)[0]==400,'Invalid limit rejected')
+    root=(d/'vault/root-token').read_text();vault=meta['urls']['vault'];path='/v1/sys/policies/acl/workshop-app'
+    code,original=request(vault,path,token=root);require(code==200,'Read app policy for isolated denial fixture')
+    try:
+        require(request(vault,path,'PUT',{'policy':'path "kv/data/workshop/db" { capabilities = ["deny"] }'},root)[0]==204,'Apply temporary app denial')
+        require(request(base,'/api/items')[0]==403,'Strict mode denies despite baseline credentials')
+        require(request(base,'/health')[1].get('unlocked') is False,'Health reflects denied policy immediately')
+    finally:
+        require(request(vault,path,'PUT',{'policy':original['data']['policy']},root)[0]==204,'Restore app policy')
+    require(request(base,'/health')[1].get('unlocked') is True,'Recover after policy restoration')
+    for path in ['/package.json','/frontend.js','/.env','/node_modules/express/package.json']:
+        require(request(meta['urls']['frontend'],path)[0]==404,'Frontend private route denied')
+    print('PASS: API provenance, puzzle, limits, real policy denial/recovery and private-file denial')
+
+
+def privacy(runtime):
+    d=Path(runtime)
+    for relative in ['bootstrap/secrets.json','postgres/admin-password','vault/root-token','app/config.json']:
+        require((d/relative).stat().st_mode & 0o077==0,'Private credential file permissions')
+    credentials=json.loads((d/'bootstrap/secrets.json').read_text())
+    secrets=[credentials['app_password'],*credentials['users'].values(),(d/'postgres/admin-password').read_text(),(d/'vault/root-token').read_text()]
+    if (d/'vault/vault.hclic').exists():secrets.append((d/'vault/vault.hclic').read_text())
+    state=(d/'terraform.tfstate').read_text()
+    require(not any(value in state for value in secrets if value),'No credential values in Terraform state')
+    app_raw=(d/'app/config.json').read_text()
+    forbidden=[*credentials['users'].values(),(d/'postgres/admin-password').read_text(),(d/'vault/root-token').read_text()]
+    if (d/'vault/vault.hclic').exists():forbidden.append((d/'vault/vault.hclic').read_text())
+    require(not any(value in app_raw for value in forbidden if value),'Application configuration excludes human/admin/license material')
+    print('PASS: runtime permissions and Terraform credential-value exclusion')
+
+
 def main():
     if len(sys.argv)!=2:raise RuntimeError('Usage: verify.py <instance runtime path>')
-    identities(sys.argv[1]);database(sys.argv[1])
+    identities(sys.argv[1]);database(sys.argv[1]);api(sys.argv[1]);privacy(sys.argv[1])
 
 if __name__=='__main__':
     try:main()
