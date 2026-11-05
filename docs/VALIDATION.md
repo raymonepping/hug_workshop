@@ -51,3 +51,13 @@ and explicit PROFILE=solution performs AppRole/KV access and reveals 32 ordered
 initials. Temporarily denying the app policy yields 403 and unlocked=false despite
 valid baseline DB credentials; restoring it recovers on the next request.
 The reference checks authorization on every request and revokes its temporary token.
+
+## Stage 5
+
+Two Chromium/Playwright tests pass against the actual viewer: real AppRole unlock,
+32 rows and the acrostic; 404 for private/source/package paths; mobile layout and
+typing an r inside the API input. Intercepted API fixtures prove baseline remains
+labelled, even a vault-kv channel cannot override unlocked=false, denied/unavailable
+transitions clear old rows/reveal, and id/idx/title hostile HTML renders as text.
+A mobile screenshot was inspected and remains in ignored .workshop/. The viewer
+serves only public assets and a non-secret runtime endpoint.

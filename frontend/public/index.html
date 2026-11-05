@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Unlock the Data · Local workshop</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/viewer.js"></script>
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">TERRAFORM / ANSIBLE / PODMAN / VAULT</p><h1>Unlock the Data</h1><p class="intro">Build the lab. Establish trust. Let the data speak.</p></header>
+    <section class="panel" aria-labelledby="connection-title">
+      <div class="section-head"><h2 id="connection-title">Your local lab</h2><span id="state" class="badge" role="status" aria-live="polite">Connecting</span></div>
+      <p id="explanation">Checking API readiness and authorization.</p>
+      <dl class="facts"><div><dt>Database</dt><dd id="database">Unknown</dd></div><div><dt>Credential source</dt><dd id="source">None</dd></div><div><dt>Vault authorization</dt><dd id="authorization">Locked</dd></div></dl>
+      <form id="api-form"><label for="api">Backend API URL</label><div class="controls"><input id="api" type="url" required spellcheck="false" autocomplete="off"><button type="submit">Use API</button><button type="button" id="refresh">Refresh</button></div></form>
+      <p id="error" role="alert"></p>
+    </section>
+    <section class="panel" aria-labelledby="data-title">
+      <div class="section-head"><h2 id="data-title">Message fragments</h2><span id="count">0 records</span></div>
+      <p id="empty">Data will appear when the lab is ready.</p>
+      <div class="table-scroll"><table><caption class="sr-only">Ordered workshop message fragments</caption><thead><tr><th scope="col">ID</th><th scope="col">Order</th><th scope="col">Title</th></tr></thead><tbody id="items"></tbody></table></div>
+      <output id="reveal" aria-live="polite" hidden></output>
+    </section>
+    <details class="panel"><summary>Health details</summary><pre id="health">Checking…</pre></details>
+    <footer>Local identities: albert · brenda · charlie. Test their permissions through Vault, independently of the application's service identity.<br>Environment access is a connectivity baseline. Vault access is a separate checkpoint.</footer>
+  </main>
+</body>
+</html>
