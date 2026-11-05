@@ -10,7 +10,7 @@ the previous stage's actual files and verification results before proceeding.
 | Order | Prompt | Dependency | Main result |
 | --- | --- | --- | --- |
 | 1 | [Foundation](01-foundation.md) | PRD | Layout, contracts, synthetic users, reproducible dependencies |
-| 2 | [Local infrastructure](02-local-infrastructure.md) | 1 | Local images and Terraform-managed Docker services |
+| 2 | [Local infrastructure](02-local-infrastructure.md) | 1 | Local images and Terraform-managed Podman services |
 | 3 | [Ansible configuration](03-ansible-configuration.md) | 1–2 | DB, Vault, policies, personas, seed data |
 | 4 | [Backend and Vault](04-backend-vault.md) | 1–3 | Real strict-mode access and learner/solution separation |
 | 5 | [Frontend](05-frontend.md) | 4 | Accurate baseline/locked/unlocked feedback |
@@ -35,7 +35,7 @@ the previous stage's actual files and verification results before proceeding.
    dependencies; do not claim support merely because a configuration parses.
 7. Run checks appropriate to the stage, report failures honestly, and update
    `docs/VALIDATION.md` and a stage-status table in `docs/IMPLEMENTATION.md`.
-   A missing Docker engine is a reported limitation, not a passing integration test.
+   A missing Podman engine is a reported limitation, not a passing integration test.
 8. Before committing, inspect the full diff for unrelated files and secret values.
    Always commit and push using `commit_gh`, with scanning enabled. Keep assistant
    instructions/tooling local. Do not use `--tree`, release/tag options, image push,

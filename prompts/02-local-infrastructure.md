@@ -3,7 +3,7 @@
 Follow the [shared instructions](README.md#instructions-shared-by-every-prompt).
 Prerequisite: stage 1's actual contracts, not assumptions about its implementation.
 
-Implement `infra/` as a local Terraform root using a pinned Docker provider and
+Implement `infra/` as a local Terraform root using a pinned Docker provider against Podman’s compatible API and
 committed provider lockfile. Build PostgreSQL, Vault, backend, and frontend images/
 containers from the declared image/source configuration. All instance lifecycle,
 network, volume, and container ownership belongs to Terraform.

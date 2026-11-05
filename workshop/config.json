@@ -1,0 +1,19 @@
+{
+  "project_id": "b1e7c4",
+  "prefix": "hug-b1e7c4-",
+  "ports": {
+    "postgres": 15432,
+    "vault": 18200,
+    "backend": 13004,
+    "frontend": 15173
+  },
+  "database": "workshop",
+  "app_user": "workshop_app",
+  "vault_mount": "kv",
+  "vault_secret": "workshop/db",
+  "images": {
+    "postgres": "postgres:17.7-alpine",
+    "vault": "hashicorp/vault:1.21.1",
+    "node": "node:22.21.1-alpine"
+  }
+}

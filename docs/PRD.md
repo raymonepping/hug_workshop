@@ -7,7 +7,7 @@ Baseline: the existing HUG workshop reviewed in [PROJECT_ANALYSIS.md](PROJECT_AN
 ## Product intent
 
 Turn the workshop into a repeatable local learning environment using Terraform,
-Ansible, Make, Docker, PostgreSQL, and HashiCorp Vault. A participant can clone the
+Ansible, Make, Podman, PostgreSQL, and HashiCorp Vault. A participant can clone the
 repository, provision the lab, configure services, demonstrate authorized and denied
 access, and remove the lab without an HCP account or a facilitator's credentials.
 
@@ -47,9 +47,9 @@ Full offline distribution and production hardening are outside the initial relea
 - Target ARM64 and AMD64 without forcing x86 emulation. Verify the selected
   container images and dependencies on both architectures.
 - Host tools: Git, GNU Make, Terraform, Python with an isolated Ansible install,
-  and a reachable Docker-compatible engine. Application Node dependencies run in
+  and a reachable Podman engine. Application Node dependencies run in
   containers by default. List exact supported versions after verification.
-- Respect the selected Docker endpoint/context; do not assume a fixed macOS socket.
+- Respect the selected Podman API endpoint/connection; do not assume a fixed macOS socket.
 - Use portable shell operations. Do not depend on GNU-only `sed`, `readlink -f`,
   Bash associative arrays, or `mapfile` without declaring/installing a compatible shell.
 - Image and dependency downloads require internet during initial setup. Execution
@@ -63,7 +63,7 @@ Full offline distribution and production hardening are outside the initial relea
 
 | Component | Owner | Boundary |
 | --- | --- | --- |
-| Networks, volumes, images, containers | Terraform Docker provider | Local state, explicit resource labels and names |
+| Networks, volumes, images, containers | Terraform Docker provider against Podman’s compatible API | Local state, explicit resource labels and names |
 | PostgreSQL roles/schema/grants and data | Ansible | Configure the existing DB; no competing container lifecycle |
 | Vault mounts/auth methods/policies/users/KV | Ansible | Configure the existing Vault via supported API/modules |
 | Local generated configuration | Ansible plus a small bootstrap helper | Private files, explicit schemas, no secrets in public output |
@@ -71,7 +71,7 @@ Full offline distribution and production hardening are outside the initial relea
 | Secret retrieval, DB connections, API gating | Backend | Dedicated application identity |
 | Health and authorized-data presentation | Frontend | Reflect backend authorization decisions |
 
-Do not manage the same Docker resources with Compose and Terraform, or configure
+Do not manage the same Podman resources with Compose and Terraform, or configure
 the same Vault policies with both Terraform and Ansible. Compose may remain only
 as a clearly labelled legacy/developer alternative outside the core lab.
 
@@ -148,7 +148,7 @@ Persistent Vault with explicit initialize/unseal steps is a possible advanced la
 
 ## Learning stages
 
-1. **Preflight:** identify prerequisites, chosen instance, ports, and Docker endpoint.
+1. **Preflight:** identify prerequisites, chosen instance, ports, and Podman API endpoint.
 2. **Provision:** inspect the Terraform plan, then create infrastructure locally.
 3. **Configure:** run Ansible, inspect non-secret task results, and seed the dataset.
 4. **Baseline:** demonstrate connectivity with environment credentials, explicitly
@@ -182,7 +182,7 @@ Use `INSTANCE=default` and documented port overrides consistently across targets
 | `make up` | Facilitator convenience: init/build/infra/configure/seed in dependency order; does not solve the learner task |
 | `make status` | Report real service/DB/auth state without printing secrets |
 | `make verify` | Run positive/negative core acceptance checks; fail clearly on an unfinished exercise |
-| `make test` | Run implementation tests; clearly declare Docker prerequisites |
+| `make test` | Run implementation tests; clearly declare Podman prerequisites |
 | `make down` | Remove instance containers/network while preserving named data volumes and state needed for reconciliation |
 | `make destroy` | Terraform-managed removal including this instance's volumes; explicit destructive confirmation |
 | `make reset` | Confirm destruction, destroy, remove this instance's runtime credentials/state only after success, and rebuild |
@@ -230,7 +230,7 @@ must not require credentials. Avoid embedding large shell programs in Make recip
 | AC-09 | Data ordering, shape, limits, and the 32-letter puzzle are verified. |
 | AC-10 | Vault outage/restart and reconfigure have documented, tested failure/recovery behavior. |
 | AC-11 | Generated credentials/state stay ignored and private; routine logs/artifacts contain no credential values. |
-| AC-12 | Scoped down/destroy/reset preserve unrelated Docker resources and never delete state before successful teardown. |
+| AC-12 | Scoped down/destroy/reset preserve unrelated Podman resources and never delete state before successful teardown. |
 | AC-13 | Participant can finish with documented checkpoints and independently reproduce verification. |
 | AC-14 | Final supported flow has no dependency on legacy HCP configuration or historical attendee exports. |
 
@@ -256,7 +256,7 @@ These describe capabilities and constraints; implementation must pin and test
 actual versions rather than copying an unverified latest-version assumption.
 
 - [Terraform local state and its handling](https://developer.hashicorp.com/terraform/language/state).
-- [Terraform Docker provider](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs).
+- [Terraform Docker provider against Podman’s compatible API](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs).
 - [Ansible URI module for service configuration](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/uri_module.html).
 - [Ansible on Windows through WSL or containers](https://docs.ansible.com/projects/ansible/latest/os_guide/intro_windows.html).
 - [Vault dev-server lifecycle](https://developer.hashicorp.com/vault/docs/concepts/dev-server).

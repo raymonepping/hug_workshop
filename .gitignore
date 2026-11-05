@@ -12,7 +12,6 @@ Thumbs.db
 v*.tar.gz
 readme_*.tpl
 reload_version.sh
-backend/vault.js
 Archive.zip
 Archive*.zip
 
@@ -108,7 +107,6 @@ ipython_config.py
 node_modules/
 node_modules/*
 npm-debug.log*
-package-lock.json
 
 ########################################
 # 🐳 Docker
@@ -131,10 +129,8 @@ lines.txt
 .terraform/
 *.tfstate
 *.tfstate.backup
-.terraform.lock.hcl
 crash.log
 .terraform/
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.backup*.backup
 convert_2_json.sh
@@ -152,3 +148,11 @@ credentials/
 scripts/output/
 scripts/attendees.auto.tfvars.json
 *.tfplan
+
+# Commit reproducible dependency locks and the participant reader.
+!backend/vault.js
+!backend/package-lock.json
+!frontend/package-lock.json
+!infra/.terraform.lock.hcl
+
+/.terraform.lock.hcl

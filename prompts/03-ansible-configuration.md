@@ -15,7 +15,7 @@ Deliver:
   Separate administrator/seeder and application roles. The app receives only
   connect/schema usage/select privileges required by the lab.
 - Idempotent dataset import using a real JSON parser and efficient database import,
-  with explicit stable ordering. Avoid row-by-row Docker invocations and shell SQL
+  with explicit stable ordering. Avoid row-by-row Podman invocations and shell SQL
   assembled from unescaped input.
 - KV v2 at the canonical mount/path; explicitly configure userpass and AppRole.
 - Personas from `workshop/users.yml`, preserving alphabetical order and stable

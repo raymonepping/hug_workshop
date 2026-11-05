@@ -1,0 +1,23 @@
+{
+  "users": [
+    {
+      "name": "albert",
+      "capabilities": [
+        "read"
+      ]
+    },
+    {
+      "name": "brenda",
+      "capabilities": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "name": "charlie",
+      "capabilities": []
+    }
+  ]
+}
