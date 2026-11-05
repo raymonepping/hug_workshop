@@ -40,3 +40,14 @@ both exercised. Enterprise manifest includes ARM64/AMD64. Its configuration also
 converges after recreation. Credentials and license were checked absent from local
 Terraform state and Vault stdout/stderr logs. Python 3.15 cannot run this Ansible
 version; tooling now explicitly selects supported Python 3.12–3.14 instead.
+
+## Stage 4
+
+Seven `npm test --prefix backend` tests pass: no env bypass on strict failures,
+baseline provenance, 12 concurrent independent connections closing, failed probe
+cleanup, incomplete starter, token revocation after denied KV reads, and HTTP
+limit/error contract. Podman rebuild/apply proves the actual starter returns 403,
+and explicit PROFILE=solution performs AppRole/KV access and reveals 32 ordered
+initials. Temporarily denying the app policy yields 403 and unlocked=false despite
+valid baseline DB credentials; restoring it recovers on the next request.
+The reference checks authorization on every request and revokes its temporary token.
