@@ -12,3 +12,14 @@ Contract tests cover invalid instance/port/profile inputs, distinct instance pat
 alphabetical personas, all 500 canonical records, and the 32-letter acrostic.
 The original ignored Vault reader was preserved privately before creating the
 tracked learner seam. Legacy app paths remain until their replacements exist.
+
+## Stage 2
+
+Both `npm ci` installs passed after reducing the backend to pinned PostgreSQL-core dependencies.
+`make doctor`, provider init/validate, Podman builds and Terraform apply passed for
+`INSTANCE=check` with ports 25432/28200/23004/25173. All four containers run.
+`make down` followed by `make infra AUTO_APPROVE=1` recreated services and retained
+the DB volume. A repeated plan reports no changes after handling Podman's injected
+IPAM/RLIMIT defaults narrowly. Generated credential values are absent from local
+Terraform state. PostgreSQL and Vault manifests include both ARM64 and AMD64.
+Other native platform runs remain pending; raw state and logs stay ignored.

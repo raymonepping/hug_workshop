@@ -12,8 +12,8 @@
   "vault_mount": "kv",
   "vault_secret": "workshop/db",
   "images": {
-    "postgres": "postgres:17.7-alpine",
-    "vault": "hashicorp/vault:1.21.1",
-    "node": "node:22.21.1-alpine"
+    "postgres": "docker.io/library/postgres:17.7-alpine",
+    "vault": "docker.io/hashicorp/vault:1.21.1",
+    "node": "docker.io/library/node:22.21.1-alpine"
   }
 }

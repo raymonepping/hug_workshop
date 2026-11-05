@@ -2,10 +2,7 @@
 import 'dotenv/config.js';
 import { readVaultSecret } from './vault.js';
 
-import { connectMySQL,    listItemsMySQL }     from './connectors/mysql.js';
 import { connectPostgres, listItemsPostgres }  from './connectors/postgres.js';
-import { connectMongo,    listItemsMongo }     from './connectors/mongodb.js';
-import { connectCouchbase,listItemsCouchbase } from './connectors/couchbase.js';
 
 function normLimit(v, def = 100, max = 500) {
   const n = Number(v);
@@ -37,7 +34,7 @@ const {
 
 const VAULT_DB_SECRET_PATH = ENV_VAULT_DB_SECRET_PATH || ENV_VAULT_DB_KV_PATH;
 
-const ALLOWED = new Set(['mysql', 'postgres', 'mongodb', 'couchbase']);
+const ALLOWED = new Set(['postgres']);
 
 function defaultPortFor(dbType) {
   switch (dbType) {
