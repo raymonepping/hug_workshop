@@ -216,3 +216,13 @@ regression and visual evidence, not a full automated accessibility audit.
 
 The default lab was restored to `PROFILE=starter`; its final health response
 reports `exercise_incomplete`, `unlocked=false`, with the updated viewer served.
+
+## Complete participant run and requested reset/shutdown
+
+All five core participant exercises were executed using an implemented learner
+reader in `PROFILE=starter`, including baseline separation, all nine persona
+decisions, unit/core/browser verification and puzzle decode. The reader stub was
+restored, `make reset` regenerated the lab and credentials, post-reset checks
+passed, and `make down` removed the default service containers/network while
+retaining its reset DB volume. See [exercise run](EXERCISE_RUN.md) for evidence
+and the final state.
